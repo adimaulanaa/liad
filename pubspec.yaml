@@ -1,0 +1,44 @@
+name: liad
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  firebase_core: ^3.8.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  fonts:
+    - family: Josefin Sans
+      fonts:
+        - asset: assets/fonts/JosefinSans-Light.ttf
+        - asset: assets/fonts/JosefinSans-Regular.ttf
+        - asset: assets/fonts/JosefinSans-Medium.ttf
+        - asset: assets/fonts/JosefinSans-SemiBold.ttf
+        - asset: assets/fonts/JosefinSans-Bold.ttf
+        - asset: assets/fonts/JosefinSans-Thin.ttf
