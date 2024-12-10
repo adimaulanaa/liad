@@ -2,21 +2,32 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/firebase/firebase_api.dart';
+import 'package:liad/features/data/dashboard_provider.dart';
+import 'package:liad/features/data/dashboard_service.dart';
 // import 'package:liad/core/utils/device_info_plus.dart';
 import 'package:liad/features/onboarding.dart';
 import 'package:liad/firebase_options.dart';
 import 'package:liad/notification_screen.dart';
+import 'package:provider/provider.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  // await getDeviceId();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseApi().initNotifications();
-  runApp(const MyApp());
+  await FirebaseApi().initScheduleSholat();
+  // runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DashboardProvider(dataService: DashboardService())),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

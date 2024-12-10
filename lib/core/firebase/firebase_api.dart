@@ -32,9 +32,9 @@ class FirebaseApi {
       }
 
       // Mendapatkan lokasi menggunakan LocationService
-    Position position = await LocationService.getCurrentLocation();
-    double latitude = position.latitude;
-    double longitude = position.longitude;
+      Position position = await LocationService.getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
 
       // Jika fCMToken kosong, hentikan proses
       if (fCMToken == null) {
@@ -88,5 +88,33 @@ class FirebaseApi {
   Future initPushNotification() async {
     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+  }
+
+  Future<void> initScheduleSholat() async {
+    DateTime now = DateTime.now();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String todayString = prefs.getString('today') ?? '';
+    if (todayString != '') {
+      DateTime today = DateTime.parse(todayString);
+      if (now.year == today.year &&
+          now.month == today.month &&
+          now.day == today.day) {
+        //
+      } else {
+        await prefs.setBool('isFajr', false);
+        await prefs.setBool('isDhuhr', false);
+        await prefs.setBool('isAsr', false);
+        await prefs.setBool('isMaghrib', false);
+        await prefs.setBool('isIsha', false);
+        await prefs.setString('today', now.toString());
+      }
+    } else {
+      await prefs.setBool('isFajr', false);
+      await prefs.setBool('isDhuhr', false);
+      await prefs.setBool('isAsr', false);
+      await prefs.setBool('isMaghrib', false);
+      await prefs.setBool('isIsha', false);
+      await prefs.setString('today', now.toString());
+    }
   }
 }

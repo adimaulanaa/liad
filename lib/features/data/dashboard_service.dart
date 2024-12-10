@@ -1,0 +1,133 @@
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:liad/features/model/schedule_sholat_model.dart';
+
+class DashboardService {
+  // API URL (sesuaikan dengan endpoint API Anda)
+  final String baseUrl = 'https://api.aladhan.com/v1/timings';
+
+  // Method untuk mengambil data dari API
+  Future<ScheduleSholatModel> getPrayerTimes(
+      String date, double latitude, double longitude) async {
+    final url = Uri.parse(
+        '$baseUrl/$date?latitude=$latitude&longitude=$longitude&method=20');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Pastikan status response adalah OK
+        if (data['code'] == 200) {
+          // Ambil data timings
+          final timings = data['data']['timings'];
+          ScheduleSholatModel model = ScheduleSholatModel(
+            fajr: timings['Fajr'],
+            sunrise: timings['Sunrise'],
+            dhuhr: timings['Dhuhr'],
+            asr: timings['Asr'],
+            sunset: timings['Sunset'],
+            maghrib: timings['Maghrib'],
+            isha: timings['Isha'],
+            imsak: timings['Imsak'],
+            midnight: timings['Midnight'],
+            firstthird: timings['Firstthird'],
+            lastthird: timings['Lastthird'],
+          );
+          ScheduleSholatModel setData = setDataModel(model);
+          // Return data waktu sholat sebagai Map
+          return setData;
+        } else {
+          throw Exception('Failed to load prayer times');
+        }
+      } else {
+        throw Exception('Failed to load data from API');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<String> getLocationOSM(double latitude, double longitude) async {
+    final url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      String res = '';
+      final data = json.decode(response.body);
+      res = data['address']['village'];
+      return res;
+    } else {
+      throw Exception('-');
+    }
+  }
+
+  // Method untuk mengambil data dari Firebase
+  Future<String> fetchPrayerScheduleFromFirebase() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('prayerSchedules')
+          .doc('today')
+          .get();
+      if (snapshot.exists) {
+        return snapshot.data()?['schedule'] ??
+            '00:00'; // Ambil waktu sholat dari Firebase
+      } else {
+        throw Exception('No data found in Firebase');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  ScheduleSholatModel setDataModel(ScheduleSholatModel model) {
+    ScheduleSholatModel result = model;
+    DateTime now = DateTime.now();
+    // DateTime now = DateTime.parse('2024-12-10 22:06:32.015176');
+    DateFormat timeFormat = DateFormat("HH:mm");
+
+    // Mengonversi waktu sholat dari string ke DateTime
+    DateTime fajr = timeFormat
+        .parse(model.fajr.toString())
+        .copyWith(year: now.year, month: now.month, day: now.day);
+    DateTime dhuhr = timeFormat
+        .parse(model.dhuhr.toString())
+        .copyWith(year: now.year, month: now.month, day: now.day);
+    DateTime asr = timeFormat
+        .parse(model.asr.toString())
+        .copyWith(year: now.year, month: now.month, day: now.day);
+    DateTime maghrib = timeFormat
+        .parse(model.maghrib.toString())
+        .copyWith(year: now.year, month: now.month, day: now.day);
+    DateTime isha = timeFormat
+        .parse(model.isha.toString())
+        .copyWith(year: now.year, month: now.month, day: now.day);
+
+    // Tentukan waktu sholat yang sedang berlangsung atau berikutnya
+    if (now.isBefore(fajr)) {
+      result.scheduleName = 'Fajr';
+      result.scheduleTime = model.fajr.toString();
+    } else if (now.isBefore(dhuhr)) {
+      result.scheduleName = 'Dhuhr';
+      result.scheduleTime = model.dhuhr.toString();
+    } else if (now.isBefore(asr)) {
+      result.scheduleName = 'Asr';
+      result.scheduleTime = model.asr.toString();
+    } else if (now.isBefore(maghrib)) {
+      result.scheduleName = 'Maghrib';
+      result.scheduleTime = model.maghrib.toString();
+    } else if (now.isBefore(isha)) {
+      result.scheduleName = 'Isha';
+      result.scheduleTime = model.isha.toString();
+    } else {
+      result.isFinis = true;
+    }
+
+    return result;
+  }
+}
