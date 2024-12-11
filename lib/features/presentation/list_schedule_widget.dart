@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
 
@@ -7,14 +8,18 @@ class ListScheduleWidget extends StatelessWidget {
   final String type;
   final String time;
   final ValueNotifier<bool> checkBox;
+  final ValueNotifier<bool> alarm;
   final VoidCallback onTapCheckBox;
+  final VoidCallback onTapAlarm;
 
   const ListScheduleWidget({
     super.key,
     required this.type,
     required this.time,
     required this.checkBox,
+    required this.alarm,
     required this.onTapCheckBox,
+    required this.onTapAlarm,
   });
 
   @override
@@ -24,7 +29,7 @@ class ListScheduleWidget extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.blue, // Ganti dengan AppColors.primary jika ada
+          color: AppColors.primary, // Ganti dengan AppColors.primary jika ada
           width: 1.0,
         ),
         borderRadius: BorderRadius.circular(10),
@@ -60,41 +65,70 @@ class ListScheduleWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          InkWell(
-            splashFactory: NoSplash.splashFactory,
-            highlightColor: Colors.transparent,
-            onTap: () {
-              checkBox.value = !checkBox.value; // Toggle status ValueNotifier
-              onTapCheckBox(); // Callback tambahan
-            },
-            child: ValueListenableBuilder<bool>(
-              valueListenable: checkBox,
-              builder: (context, isEnabled, child) {
-                return Row(
-                  children: [
-                    SvgPicture.asset(
-                      isEnabled ? MediaRes.checklist : MediaRes.unChecklist,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+                onTap: () {
+                  checkBox.value =
+                      !checkBox.value; // Toggle status ValueNotifier
+                  onTapCheckBox(); // Callback tambahan
+                },
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: checkBox,
+                  builder: (context, isEnabled, child) {
+                    return Row(
+                      children: [
+                        SvgPicture.asset(
+                          isEnabled ? MediaRes.checklist : MediaRes.unChecklist,
+                          fit: BoxFit.cover,
+                          // ignore: deprecated_member_use
+                          color: isEnabled
+                              ? Colors.grey
+                              : Colors.black, // Ganti sesuai warna
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Selesai",
+                          style: transTextstyle.copyWith(
+                            fontSize: 14,
+                            fontWeight: bold,
+                            color: isEnabled ? Colors.grey : Colors.black,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              InkWell(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+                onTap: () {
+                  alarm.value = !alarm.value; // Toggle status ValueNotifier
+                  onTapAlarm(); // Callback tambahan
+                },
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: alarm,
+                  builder: (context, isEnabled, child) {
+                    return SvgPicture.asset(
+                      isEnabled ? MediaRes.alarmDring : MediaRes.alarmSlient,
                       fit: BoxFit.cover,
                       // ignore: deprecated_member_use
                       color: isEnabled
-                          ? Colors.grey
-                          : Colors.black, // Ganti sesuai warna
+                          ? Colors.black
+                          : Colors.grey, // Ganti sesuai warna
                       width: 20,
                       height: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      "Selesai",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isEnabled ? Colors.grey : Colors.black,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

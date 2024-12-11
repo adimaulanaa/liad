@@ -67,6 +67,48 @@ class DashboardService {
     }
   }
 
+  Future<bool> sendNotification(
+    String serverKey,
+    String token,
+    String title,
+    String message,
+  ) async {
+    const String fcmUrl = 'https://fcm.googleapis.com/v1/projects/liad-apps/messages:send';
+    token = 'fzEbD4mGTPezClNjNEBLMQ:APA91bHaSrnt_n1Btq6zkA5zKm3O6IaUEggA0-hDjZwHLsT2xRzDZFLuSagnJDg_H-oXgad6qvtdZaBbLOGxiN2fWY6uB6kM2Ea9tUm9vFKaXPltEBIMO3o';
+
+    try {
+      final response = await http.post(
+        Uri.parse(fcmUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'key=$serverKey',
+        },
+        body: jsonEncode({
+          'to': token,
+          'notification': {
+            'title': title,
+            'body': message,
+          },
+          'data': {
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'status': 'done',
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // print('Notification sent successfully!');
+        return true;
+      } else {
+        // print('Failed to send notification: ${response.body}');
+        throw Exception('Failed to send notification: ${response.body}');
+      }
+    } catch (e) {
+      // print('Error sending notification: $e');
+      throw Exception(e);
+    }
+  }
+
   // Method untuk mengambil data dari Firebase
   Future<String> fetchPrayerScheduleFromFirebase() async {
     try {

@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
+import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
 import 'package:liad/core/utils/loading.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/presentation/list_schedule_widget.dart';
+import 'package:liad/features/presentation/send_notification_screen.dart';
+import 'package:liad/features/widgets/dashboard_widget.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -34,6 +37,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ValueNotifier<bool> isAsr = ValueNotifier(false);
   final ValueNotifier<bool> isMaghrib = ValueNotifier(false);
   final ValueNotifier<bool> isIsha = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmFajr = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmDhuhr = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmAsr = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmMaghrib = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmIsha = ValueNotifier(false);
   ScheduleSholatModel model = ScheduleSholatModel();
 
   @override
@@ -96,56 +104,108 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  SingleChildScrollView bodyData(BuildContext context, Size size) {
+  SafeArea bodyData(BuildContext context, Size size) {
     formattedDate = DateFormat('dd MMMM yyyy').format(now);
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          children: [
-            _contentSholat(),
-            SizedBox(height: size.height * 0.06),
-            ListScheduleWidget(
-              type: "Fajr",
-              time: model.fajr.toString(),
-              checkBox: isFajr,
-              onTapCheckBox: () {
-                updateFinish(1, isFajr.value);
-              },
-            ),
-            ListScheduleWidget(
-              type: "Dhuhr",
-              time: model.dhuhr.toString(),
-              checkBox: isDhuhr,
-              onTapCheckBox: () {
-                updateFinish(2, isDhuhr.value);
-              },
-            ),
-            ListScheduleWidget(
-              type: "Asr",
-              time: model.asr.toString(),
-              checkBox: isAsr,
-              onTapCheckBox: () {
-                updateFinish(3, isAsr.value);
-              },
-            ),
-            ListScheduleWidget(
-              type: "Maghrib",
-              time: model.maghrib.toString(),
-              checkBox: isMaghrib,
-              onTapCheckBox: () {
-                updateFinish(4, isMaghrib.value);
-              },
-            ),
-            ListScheduleWidget(
-              type: "Isha",
-              time: model.isha.toString(),
-              checkBox: isIsha,
-              onTapCheckBox: () {
-                updateFinish(5, isIsha.value);
-              },
-            ),
-          ],
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20),
+          child: Column(
+            children: [
+              _contentSholat(),
+              SizedBox(height: size.height * 0.02),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SendNotificationScreen(),
+                        ),
+                      );
+                    },
+                    child: SvgIconContainer(
+                      assetPath: MediaRes.sendNotif,
+                      size: size,
+                      borderColor: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  SvgIconContainer(
+                    assetPath: MediaRes.compass,
+                    size: size,
+                    colorIcon: true,
+                    borderColor: AppColors.primary,
+                  ),
+                ],
+              ),
+              SizedBox(height: size.height * 0.04),
+              ListScheduleWidget(
+                alarm: isAlarmFajr,
+                type: "Fajr",
+                time: model.fajr.toString(),
+                checkBox: isFajr,
+                onTapCheckBox: () {
+                  updateFinish(1, isFajr.value);
+                },
+                onTapAlarm: () {
+                  //
+                },
+              ),
+              ListScheduleWidget(
+                alarm: isAlarmDhuhr,
+                type: "Dhuhr",
+                time: model.dhuhr.toString(),
+                checkBox: isDhuhr,
+                onTapCheckBox: () {
+                  updateFinish(2, isDhuhr.value);
+                },
+                onTapAlarm: () {
+                  //
+                },
+              ),
+              ListScheduleWidget(
+                alarm: isAlarmAsr,
+                type: "Asr",
+                time: model.asr.toString(),
+                checkBox: isAsr,
+                onTapCheckBox: () {
+                  updateFinish(3, isAsr.value);
+                },
+                onTapAlarm: () {
+                  //
+                },
+              ),
+              ListScheduleWidget(
+                alarm: isAlarmMaghrib,
+                type: "Maghrib",
+                time: model.maghrib.toString(),
+                checkBox: isMaghrib,
+                onTapCheckBox: () {
+                  updateFinish(4, isMaghrib.value);
+                },
+                onTapAlarm: () {
+                  //
+                },
+              ),
+              ListScheduleWidget(
+                alarm: isAlarmIsha,
+                type: "Isha",
+                time: model.isha.toString(),
+                checkBox: isIsha,
+                onTapCheckBox: () {
+                  updateFinish(5, isIsha.value);
+                },
+                onTapAlarm: () {
+                  //
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
