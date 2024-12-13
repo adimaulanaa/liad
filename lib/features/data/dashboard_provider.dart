@@ -31,9 +31,8 @@ class DashboardProvider extends ChangeNotifier {
 
   Future<String> loadLocation() async {
     try {
-      Position position = await LocationService.getCurrentLocation();
-      double latitude = position.latitude;
-      double longitude = position.longitude;
+      double latitude = await LocationService.isLatitude();
+      double longitude = await LocationService.isLongitude();
       // Ambil data dari API atau Firebase, misalnya Firebase diutamakan
       String data = await dataService.getLocationOSM(latitude, longitude);
       notifyListeners();

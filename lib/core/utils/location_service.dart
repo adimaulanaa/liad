@@ -1,34 +1,47 @@
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
-  /// Mendapatkan lokasi perangkat saat ini.
-  static Future<Position> getCurrentLocation() async {
-    // Memastikan layanan lokasi aktif
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      throw Exception('Layanan lokasi tidak aktif.');
-    }
+  static Future<bool> isGpsEnabled() async {
+    return await Geolocator.isLocationServiceEnabled();
+  }
 
-    // Memeriksa izin lokasi
+  static Future<bool> requestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw Exception('Izin lokasi ditolak.');
-      }
     }
+    return permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always;
+  }
 
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception(
-          'Izin lokasi ditolak secara permanen. Tidak dapat meminta izin.');
-    }
-
-    // Mendapatkan lokasi saat ini dengan pengaturan akurasi tinggi
+  static Future<Position> getCurrentLocation() async {
     return await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         distanceFilter: 100,
         accuracy: LocationAccuracy.high,
       ),
     );
+  }
+
+  static Future<double> isLatitude() async {
+    bool isGps = await isGpsEnabled();
+    bool isPermission = await requestPermission();
+    double latitude = -1.003189; // Default latitude
+    if (isGps && isPermission) {
+      Position position = await LocationService.getCurrentLocation();
+      latitude = position.latitude;
+    }
+    return latitude;
+  }
+
+  static Future<double> isLongitude() async {
+    bool isGps = await isGpsEnabled();
+    bool isPermission = await requestPermission();
+    double longitude = 101.972332; // Default longitude
+    if (isGps && isPermission) {
+      Position position = await LocationService.getCurrentLocation();
+      longitude = position.longitude;
+    }
+    return longitude;
   }
 }

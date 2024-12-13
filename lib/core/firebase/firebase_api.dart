@@ -13,6 +13,8 @@ class FirebaseApi {
   Future<void> initNotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     DateTime now = DateTime.now();
+    double latitude = -1.003189; // Default latitude
+    double longitude = 101.972332; // Default longitude
     try {
       // Mendapatkan token FCM
       final fCMToken = await _firebaseMessaging.getToken();
@@ -31,10 +33,16 @@ class FirebaseApi {
         await prefs.setString('devicesId', deviceId);
       }
 
+      // Memeriksa status GPS dan izin lokasi
+      bool isGpsEnabled = await LocationService.isGpsEnabled();
+      bool isPermissionGranted = await LocationService.requestPermission();
       // Mendapatkan lokasi menggunakan LocationService
-      Position position = await LocationService.getCurrentLocation();
-      double latitude = position.latitude;
-      double longitude = position.longitude;
+      if (isGpsEnabled && isPermissionGranted) {
+        // Jika GPS hidup dan akses diberikan, ambil lokasi
+        Position position = await LocationService.getCurrentLocation();
+        latitude = position.latitude;
+        longitude = position.longitude;
+      }
 
       // Jika fCMToken kosong, hentikan proses
       if (fCMToken == null) {
