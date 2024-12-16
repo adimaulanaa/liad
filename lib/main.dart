@@ -4,16 +4,18 @@ import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/firebase/firebase_api.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/data/dashboard_service.dart';
-// import 'package:liad/core/utils/device_info_plus.dart';
 import 'package:liad/features/onboarding.dart';
 import 'package:liad/firebase_options.dart';
 import 'package:liad/notification_screen.dart';
 import 'package:provider/provider.dart';
+// import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

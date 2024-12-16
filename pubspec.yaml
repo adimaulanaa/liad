@@ -27,6 +27,8 @@ dependencies:
   flutter_svg: ^2.0.16
   flutter_launcher_icons: ^0.14.2
   googleapis_auth: ^1.6.0
+  timezone: ^0.10.0
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:

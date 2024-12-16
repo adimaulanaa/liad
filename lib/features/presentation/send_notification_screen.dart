@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:liad/core/firebase/get_services_key.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_text.dart';
-import 'package:liad/features/data/dashboard_provider.dart';
-import 'package:liad/features/model/send_notif_model.dart';
-import 'package:provider/provider.dart';
+// import 'package:liad/features/data/dashboard_provider.dart';
+// import 'package:liad/features/model/send_notif_model.dart';
+// import 'package:provider/provider.dart';
 
 class SendNotificationScreen extends StatefulWidget {
   const SendNotificationScreen({super.key});
@@ -113,20 +113,20 @@ class _SendNotificationScreenState extends State<SendNotificationScreen> {
   }
 
   void sendNotif() async {
-    final title = _titleController.text;
-    final message = _messageController.text;
+    // final title = _titleController.text;
+    // final message = _messageController.text;
     GetServicesKey getServicesKey = GetServicesKey();
     String accessToken = await getServicesKey.getServicesKeyToken();
     if (accessToken != '') {
       // ignore: use_build_context_synchronously
-      final provider = Provider.of<DashboardProvider>(context, listen: false);
-      SendNotifModel send = await provider.sendNotif(accessToken, 'title', 'message');
-      print(send.isError);
+      // final provider = Provider.of<DashboardProvider>(context, listen: false);
+      // SendNotifModel send = await provider.sendNotif(accessToken, 'title', 'message');
+      // print(send.isError);
 
       // Handle sending notification logic here
-      print('Title: $title');
-      print('Message: $message');
-      print('accessToken: $accessToken');
+      // print('Title: $title');
+      // print('Message: $message');
+      // print('accessToken: $accessToken');
     }
   }
 }

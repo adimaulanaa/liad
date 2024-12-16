@@ -26,7 +26,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isSholatFinish = false;
   late Timer _timer;
   late DateTime _currentTime;
+  String _formattedTime = '';
   String formattedDate = '-';
+  String formattedTimes = '-';
   DateTime now = DateTime.now();
   String scheduleSholat = '00:00';
   String nameSholat = '-';
@@ -254,7 +256,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               Text(
-                _formatTime(_currentTime),
+                _formattedTime,
                 style: whiteTextstyle.copyWith(
                   fontSize: 17,
                   fontWeight: bold,
@@ -320,18 +322,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// Memulai Timer untuk memperbarui waktu setiap detik
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
+        DateTime now = DateTime.now();
         _currentTime = DateTime.now();
+        String timezone = now.timeZoneName; // Mendapatkan nama timezone
+        _formattedTime = '${DateFormat.Hms().format(now.toLocal())} $timezone';
       });
     });
-  }
-
-  /// Format waktu ke bentuk yang lebih user-friendly
-  String _formatTime(DateTime time) {
-    return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
   }
 
   /// Menghitung waktu yang tersisa menuju waktu sholat
