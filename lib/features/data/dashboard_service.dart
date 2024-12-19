@@ -188,9 +188,11 @@ class DashboardService {
           await myStore.where('devices_id', isEqualTo: deviceId).get();
       if (querySnapshot.docs.isNotEmpty) {
         DocumentSnapshot doc = querySnapshot.docs.first;
-
         model = ProfileModel.fromMap(doc.data() as Map<String, dynamic>);
         model.id = doc.id;
+        if (model.name == '') {
+          model.isSucces = false;
+        }
         return model;
       } else {
         return model;

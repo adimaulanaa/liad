@@ -12,52 +12,37 @@ class UpdateNameModel {
 class ProfileModel {
   String? id;
   String? devicesId;
-  String? connectId;
   String? connectName;
-  String? name;
+  String? connectId;
   String? latitude;
   String? longitude;
+  String? name;
   String? timstamp;
-  bool? isProfile;
+  bool? isSucces;
 
   ProfileModel({
     this.id,
     this.devicesId,
-    this.connectId,
     this.connectName,
-    this.name,
+    this.connectId,
     this.latitude,
     this.longitude,
+    this.name,
     this.timstamp,
-    this.isProfile,
+    this.isSucces = true,
   });
 
-  // Method untuk membuat model dari Map (JSON)
   factory ProfileModel.fromMap(Map<String, dynamic> map) {
     return ProfileModel(
-      id: map['id'],
-      devicesId: map['devices_id'],
-      connectId: map['connect_id'],
-      connectName: map['connect_name'],
-      name: map['name'],
-      latitude: map['latitude'],
-      longitude: map['longitude'],
-      timstamp: map['timstamp'],
-      isProfile: map['is_profile'],
+      id: map['id'] as String?, // Tambahkan jika 'id' diperlukan
+      devicesId: map['devices_id'] as String? ?? '', 
+      connectName: map['connect_name'] as String? ?? '', 
+      connectId: map['connect_id'] as String? ?? '', 
+      latitude: map['latitude']?.toString() ?? '', 
+      longitude: map['longitude']?.toString() ?? '',
+      name: map['name'] as String? ?? '',
+      timstamp: map['timstamp'] as String? ?? '',
     );
   }
-
-  // Method untuk konversi model ke Map (untuk menyimpan ke Firestore, SharedPreferences, dll)
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'connect_id': connectId,
-      'connect_name': connectName,
-      'name': name,
-      'latitude': latitude,
-      'longitude': longitude,
-      'timstamp': timstamp,
-      'is_profile': isProfile,
-    };
-  }
 }
+

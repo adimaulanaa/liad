@@ -198,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String connect(String name) {
     String name = 'Connect Love';
-    if (profile.connectName != '') {
+    if (profile.connectName != '' && profile.connectName != null) {
       name = ' Your Connect ${profile.connectName}';
     }
     return name;

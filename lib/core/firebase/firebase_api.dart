@@ -20,6 +20,8 @@ class FirebaseApi {
       final fCMToken = await _firebaseMessaging.getToken();
       final CollectionReference myStore =
           FirebaseFirestore.instance.collection("Users");
+      final CollectionReference myProfile =
+          FirebaseFirestore.instance.collection("Profile");
 
       await _firebaseMessaging.requestPermission();
       await prefs.setString('token', fCMToken ?? '');
@@ -74,6 +76,30 @@ class FirebaseApi {
           'latitude': latitude,
           'longitude': longitude,
           'created': now.toString(),
+        });
+      }
+
+      // profile
+      QuerySnapshot profileSnapshot =
+          await myProfile.where('devices_id', isEqualTo: deviceId).get();
+      if (profileSnapshot.docs.isEmpty) {
+        // Jika data belum ada, insert data baru
+        await myProfile.add({
+          'name': '',
+          'connect_id': '',
+          'connect_name': '',
+          'devices_id': deviceId,
+          'latitude': latitude,
+          'longitude': longitude,
+          'timstamp': now.toString(),
+        });
+      } else {
+        // Jika data sudah ada, lakukan update
+        DocumentSnapshot existingDoc = profileSnapshot.docs.first;
+        await existingDoc.reference.update({
+          'latitude': latitude,
+          'longitude': longitude,
+          'timstamp': now.toString(),
         });
       }
     } catch (e) {
