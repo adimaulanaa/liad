@@ -9,6 +9,7 @@ import 'package:liad/features/onboarding.dart';
 import 'package:liad/firebase_options.dart';
 import 'package:liad/notification_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -23,11 +24,12 @@ void main() async {
   );
   await FirebaseApi().initNotifications();
   await FirebaseApi().initScheduleSholat();
+  final prefs = await SharedPreferences.getInstance();
   // runApp(const MyApp());
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => DashboardProvider(dataService: DashboardService())),
+        ChangeNotifierProvider(create: (_) => DashboardProvider(dataService: DashboardService(), prefs: prefs)),
       ],
       child: const MyApp(),
     ),

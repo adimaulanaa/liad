@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardService {
   // API URL (sesuaikan dengan endpoint API Anda)
@@ -73,8 +75,10 @@ class DashboardService {
     String title,
     String message,
   ) async {
-    const String fcmUrl = 'https://fcm.googleapis.com/v1/projects/liad-apps/messages:send';
-    token = 'fzEbD4mGTPezClNjNEBLMQ:APA91bHaSrnt_n1Btq6zkA5zKm3O6IaUEggA0-hDjZwHLsT2xRzDZFLuSagnJDg_H-oXgad6qvtdZaBbLOGxiN2fWY6uB6kM2Ea9tUm9vFKaXPltEBIMO3o';
+    const String fcmUrl =
+        'https://fcm.googleapis.com/v1/projects/liad-apps/messages:send';
+    token =
+        'fzEbD4mGTPezClNjNEBLMQ:APA91bHaSrnt_n1Btq6zkA5zKm3O6IaUEggA0-hDjZwHLsT2xRzDZFLuSagnJDg_H-oXgad6qvtdZaBbLOGxiN2fWY6uB6kM2Ea9tUm9vFKaXPltEBIMO3o';
 
     try {
       final response = await http.post(
@@ -171,5 +175,75 @@ class DashboardService {
     }
 
     return result;
+  }
+
+  Future<ProfileModel> getProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    ProfileModel model = ProfileModel();
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Profile");
+    try {
+      String? deviceId = prefs.getString('devicesId');
+      QuerySnapshot querySnapshot =
+          await myStore.where('devices_id', isEqualTo: deviceId).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+
+        model = ProfileModel.fromMap(doc.data() as Map<String, dynamic>);
+        model.id = doc.id;
+        return model;
+      } else {
+        return model;
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+    }
+    return model;
+  }
+
+  Future<String> updateNames(String id, name) async {
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Profile");
+    try {
+      DateTime now = DateTime.now();
+      await myStore.doc(id).update({
+        'name': name,
+        'timstamp': now.toString(),
+      });
+      return 'Success';
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+    }
+    return '';
+  }
+
+  Future<String> updateConnect(String id, nameId) async {
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Profile");
+    try {
+      DateTime now = DateTime.now();
+      String name = '';
+      DocumentSnapshot docSnapshot = await myStore.doc(nameId).get();
+      if (docSnapshot.exists) {
+        ProfileModel model = ProfileModel.fromMap(docSnapshot.data() as Map<String, dynamic>);
+        name = model.name.toString();
+      }
+      if (name != '') {
+        await myStore.doc(id).update({
+          'connect_id': nameId,
+          'connect_name': name,
+          'timstamp': now.toString(),
+        });
+        return 'Success';
+      } else {
+        return '';
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+    }
+    return '';
   }
 }

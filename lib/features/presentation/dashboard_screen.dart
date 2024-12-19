@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:liad/core/alarm/alarm.dart';
 import 'package:liad/core/config/config_resources.dart';
@@ -11,9 +12,8 @@ import 'package:liad/core/utils/loading.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/presentation/list_schedule_widget.dart';
-import 'package:liad/features/presentation/send_notification_screen.dart';
+import 'package:liad/features/presentation/profile_screen.dart';
 import 'package:liad/features/widgets/alarm_notification.dart';
-import 'package:liad/features/widgets/dashboard_widget.dart';
 import 'package:liad/features/widgets/widget_dash.dart';
 import 'package:provider/provider.dart';
 
@@ -30,6 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isSholatFinish = false;
   late Timer _timer;
   late DateTime _currentTime;
+  String myName = '';
   String _formattedTime = '';
   String formattedDate = '-';
   String formattedTimes = '-';
@@ -81,6 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     model = await provider.loadPrayerSchedule(date);
     location = await provider.loadLocation();
+    myName = await getName();
     if (!model.isError) {
       isLoading = false;
       if (model.scheduleTime != '') {
@@ -108,13 +110,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: AppColors.bgScreen,
       appBar: AppBar(
         backgroundColor: AppColors.bgScreen,
+        leading: null,
         title: Text(
-          'Hi, ${StringResources.myName}',
+          'Hi, $myName',
           style: blackTextstyle.copyWith(
             fontSize: 20,
             fontWeight: bold,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: InkWell(
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+              child: SvgPicture.asset(
+                MediaRes.settings,
+                fit: BoxFit.contain,
+                width: 35,
+                // ignore: deprecated_member_use
+                color: AppColors.bgBlack,
+              ),
+            ),
+          ),
+        ],
       ),
       body: isLoading
           ? const UIDialogLoading(text: StringResources.loading)
@@ -132,41 +159,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               _contentSholat(),
               SizedBox(height: size.height * 0.02),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    splashFactory: NoSplash.splashFactory,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SendNotificationScreen(),
-                        ),
-                      );
-                    },
-                    child: SvgIconContainer(
-                      assetPath: MediaRes.sendNotif,
-                      size: size,
-                      borderColor: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  InkWell(
-                    splashFactory: NoSplash.splashFactory,
-                    highlightColor: Colors.transparent,
-                    onTap: () {},
-                    child: SvgIconContainer(
-                      assetPath: MediaRes.compass,
-                      size: size,
-                      colorIcon: true,
-                      borderColor: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: size.height * 0.04),
               ListScheduleWidget(
                 alarm: isAlarmFajr,
                 type: "Fajr",
@@ -507,7 +499,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bool maghrib = isTimeBeforeNow(model.maghrib.toString());
       if (maghrib) {
         isAlarmMaghrib.value = maghrib;
-        var alarmDateTime = setDateTimeSchadule(model.maghrib.toString());
+        // var alarmDateTime = setDateTimeSchadule(model.maghrib.toString());
+        var alarmDateTime = setDateTimeSchadule('16:30');
         setAlarm(4, alarmDateTime, StringResources.titleMaghrib,
             StringResources.bodyMaghrib);
       }

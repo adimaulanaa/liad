@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:liad/core/utils/location_service.dart';
 import 'package:liad/features/data/dashboard_service.dart';
+import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/send_notif_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardProvider extends ChangeNotifier {
   final DashboardService dataService;
+  final SharedPreferences prefs;
   String scheduleSholat = '00:00';
   String nameSholat = '-';
 
-  DashboardProvider({required this.dataService});
+  DashboardProvider({required this.dataService, required this.prefs});
 
   // Method untuk mengambil data waktu sholat
   Future<ScheduleSholatModel> loadPrayerSchedule(String date) async {
@@ -111,6 +113,43 @@ class DashboardProvider extends ChangeNotifier {
         break;
       default:
         break;
+    }
+  }
+
+  Future<ProfileModel> getProfile() async {
+    try {
+      ProfileModel get = await dataService.getProfile();
+      // Ambil data dari API atau Firebase, misalnya Firebase diutamakan
+      ProfileModel data = get;
+      notifyListeners();
+      return data;
+    } catch (e) {
+      return ProfileModel();
+    }
+  }
+
+  Future<UpdateNameModel> updateNames(String id, name) async {
+    try {
+      String get = await dataService.updateNames(id, name);
+      await prefs.setString('myname', name);
+      notifyListeners();
+      return UpdateNameModel(isError: false, error: get);
+    } catch (e) {
+      return UpdateNameModel(isError: true, error: e.toString());
+    }
+  }
+
+  Future<UpdateNameModel> updateConnect(String id, name) async {
+    try {
+      bool isSuc = false;
+      String get = await dataService.updateConnect(id, name);
+      if (get == '') {
+        isSuc = true;
+      }
+      notifyListeners();
+      return UpdateNameModel(isError: isSuc, error: get);
+    } catch (e) {
+      return UpdateNameModel(isError: true, error: e.toString());
     }
   }
 }

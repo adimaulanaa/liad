@@ -20,7 +20,12 @@ class StringResources {
   static const String titleMaghrib = "Sholat Maghrib";  
   static const String bodyMaghrib = "Ayoo Maghrib Duluuuu";
   static const String titleIsha = "Sholat Isha";  
-  static const String bodyIsha = "Ayoo Isha Duluuuu";  
+  static const String bodyIsha = "Ayoo Isha Duluuuu"; 
+
+
+  //! Profile 
+  static const String changeName = "Update Nama";  
+  static const String connectPatner = "Your ID Love";  
 
 
 }

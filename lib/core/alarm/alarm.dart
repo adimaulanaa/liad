@@ -35,8 +35,12 @@ void stopAlarm(int alarmId) async {
   bool isStopped = await Alarm.stop(alarmId);
 
   if (isStopped) {
-    print('Alarm $alarmId berhasil dimatikan.');
+    if (kDebugMode) {
+      print('Alarm $alarmId berhasil dimatikan.');
+    }
   } else {
-    print('Gagal mematikan alarm $alarmId.');
+    if (kDebugMode) {
+      print('Gagal mematikan alarm $alarmId.');
+    }
   }
 }
