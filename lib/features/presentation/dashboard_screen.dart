@@ -153,11 +153,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  SvgIconContainer(
-                    assetPath: MediaRes.compass,
-                    size: size,
-                    colorIcon: true,
-                    borderColor: AppColors.primary,
+                  InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {},
+                    child: SvgIconContainer(
+                      assetPath: MediaRes.compass,
+                      size: size,
+                      colorIcon: true,
+                      borderColor: AppColors.primary,
+                    ),
                   ),
                 ],
               ),

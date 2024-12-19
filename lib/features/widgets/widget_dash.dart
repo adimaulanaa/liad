@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:liad/core/config/config_resources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String getDayName() {
@@ -84,4 +85,10 @@ DateTime setDateTimeSchadule(String time) {
     } else if (type == 5) {
       await prefs.setBool('isIsha', value);
     }
+  }
+
+  Future<String> getName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String myName = prefs.getString('myname') ?? StringResources.myName;
+    return myName;
   }

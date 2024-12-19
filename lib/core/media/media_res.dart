@@ -9,6 +9,7 @@ class MediaRes {
 
   // ! Onboarding
   static const omboarding = '$_baseImage/awan.png';
+  static const alarmBackground = '$_baseImage/alarm-background.png';
 
   static const checklist = '$_baseIcon/checklist.svg';
   static const unChecklist = '$_baseIcon/unchecklist.svg';
