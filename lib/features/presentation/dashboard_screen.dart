@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:liad/core/alarm/alarm.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
@@ -10,7 +12,9 @@ import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/presentation/list_schedule_widget.dart';
 import 'package:liad/features/presentation/send_notification_screen.dart';
+import 'package:liad/features/widgets/alarm_notification.dart';
 import 'package:liad/features/widgets/dashboard_widget.dart';
+import 'package:liad/features/widgets/widget_dash.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -46,6 +50,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ValueNotifier<bool> isAlarmIsha = ValueNotifier(false);
   ScheduleSholatModel model = ScheduleSholatModel();
 
+  late List<AlarmSettings> alarms;
+  late AlarmSettings alarm;
+  static StreamSubscription<AlarmSettings>? subscription;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +61,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     day = getDayName();
     _startTimer(); // Memulai Timer
     _loadData();
+    //notifcation permission
+    checkAndroidNotificationPermission();
+    //schedule alarm permission
+    checkAndroidScheduleExactAlarmPermission();
+    loadAlarms();
+    subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+    //listen alarm if active than navigate to alarm screen
   }
 
   @override
@@ -83,6 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     isAsr.value = await provider.loadScheduleSholat(3);
     isMaghrib.value = await provider.loadScheduleSholat(4);
     isIsha.value = await provider.loadScheduleSholat(5);
+    initAlarm();
   }
 
   @override
@@ -155,7 +171,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(1, isFajr.value);
                 },
                 onTapAlarm: () {
-                  //
+                  if (isAlarmFajr.value == false) {
+                    isAlarmFajr.value = true;
+                    var alarmDateTime =
+                        setDateTimeSchadule(model.fajr.toString());
+                    setAlarm(1, alarmDateTime, StringResources.titleFajr,
+                        StringResources.bodyFajr);
+                  } else {
+                    isAlarmFajr.value = false;
+                    stopAlarm(1);
+                  }
                 },
               ),
               ListScheduleWidget(
@@ -167,7 +192,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(2, isDhuhr.value);
                 },
                 onTapAlarm: () {
-                  //
+                  if (isAlarmDhuhr.value == false) {
+                    isAlarmDhuhr.value = true;
+                    var alarmDateTime =
+                        setDateTimeSchadule(model.dhuhr.toString());
+                    setAlarm(2, alarmDateTime, StringResources.titleDhuhr,
+                        StringResources.bodyDhuhr);
+                  } else {
+                    isAlarmDhuhr.value = false;
+                    stopAlarm(2);
+                  }
                 },
               ),
               ListScheduleWidget(
@@ -179,7 +213,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(3, isAsr.value);
                 },
                 onTapAlarm: () {
-                  //
+                  if (isAlarmAsr.value == false) {
+                    isAlarmAsr.value = true;
+                    var alarmDateTime =
+                        setDateTimeSchadule(model.asr.toString());
+                    setAlarm(3, alarmDateTime, StringResources.titleAsr,
+                        StringResources.bodyAsr);
+                  } else {
+                    isAlarmAsr.value = false;
+                    stopAlarm(3);
+                  }
                 },
               ),
               ListScheduleWidget(
@@ -191,7 +234,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(4, isMaghrib.value);
                 },
                 onTapAlarm: () {
-                  //
+                  if (isAlarmMaghrib.value == false) {
+                    isAlarmMaghrib.value = true;
+                    var alarmDateTime =
+                        setDateTimeSchadule(model.maghrib.toString());
+                    setAlarm(4, alarmDateTime, StringResources.titleMaghrib,
+                        StringResources.bodyMaghrib);
+                  } else {
+                    isAlarmMaghrib.value = false;
+                    stopAlarm(4);
+                  }
                 },
               ),
               ListScheduleWidget(
@@ -203,7 +255,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(5, isIsha.value);
                 },
                 onTapAlarm: () {
-                  //
+                  if (isAlarmIsha.value == false) {
+                    isAlarmIsha.value = true;
+                    var alarmDateTime =
+                        setDateTimeSchadule(model.isha.toString());
+                    setAlarm(5, alarmDateTime, StringResources.titleIsha,
+                        StringResources.bodyIsha);
+                  } else {
+                    isAlarmIsha.value = false;
+                    stopAlarm(5);
+                  }
                 },
               ),
             ],
@@ -328,7 +389,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         DateTime now = DateTime.now();
         _currentTime = DateTime.now();
         String timezone = now.timeZoneName; // Mendapatkan nama timezone
-        _formattedTime = '${DateFormat.Hms().format(now.toLocal())} $timezone';
+        _formattedTime = '${DateFormat.Hm().format(now.toLocal())} $timezone';
       });
     });
   }
@@ -358,16 +419,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Duration remainingDuration = prayerDateTime.difference(_currentTime);
 
     // Mengonversi durasi menjadi format jam:menit:detik
-    String remainingTime = _formatDuration(remainingDuration);
+    String remainingTime = formatDuration(remainingDuration);
     return "Next Prayer in : $remainingTime";
-  }
-
-  /// Format durasi menjadi format jam:menit:detik
-  String _formatDuration(Duration duration) {
-    int hours = duration.inHours;
-    int minutes = duration.inMinutes % 60;
-    int seconds = duration.inSeconds % 60;
-    return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
 
   void updateFinish(int type, bool value) async {
@@ -375,35 +428,96 @@ class _DashboardScreenState extends State<DashboardScreen> {
     await provider.updateScheduleSholat(type, value);
   }
 
-  String getDayName() {
-    switch (now.weekday) {
-      case 1:
-        return "Senin";
-      case 2:
-        return "Selasa";
-      case 3:
-        return "Rabu";
-      case 4:
-        return "Kamis";
-      case 5:
-        return "Jumat";
-      case 6:
-        return "Sabtu";
-      case 7:
-        return "Minggu";
-      default:
-        return "Tidak diketahui";
+  Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            AlarmNotificationScreen(alarmSettings: alarmSettings),
+      ),
+    );
+    loadAlarms();
+  }
+
+  Future<void> loadAlarms() async {
+    try {
+      final fetchedAlarms = await Alarm.getAlarms(); // Tunggu hasil Future
+      setState(() {
+        alarms = fetchedAlarms;
+        alarms.sort((a, b) =>
+            a.dateTime.isBefore(b.dateTime) ? -1 : 1); // Urutkan dengan benar
+      });
+    } catch (e) {
+      debugPrint('Error loading alarms: $e'); // Tangani error jika ada
     }
   }
 
-  String getAmPm(String time) {
-    // Format waktu ke DateTime
-    final dateFormat = DateFormat("HH:mm");
-    final dateTime = dateFormat.parse(time);
-    String check = dateTime.hour >= 12 ? "PM" : "AM";
-    String res = '$time $check';
+  void setAlarm(int id, DateTime date, String title, body) async {
+    final alarmSettings = AlarmSettings(
+      id: id,
+      dateTime: date,
+      assetAudioPath: 'assets/ringtone/alarm-tone.mp3',
+      loopAudio: true,
+      vibrate: true,
+      volume: 0.8,
+      fadeDuration: 3.0,
+      notificationSettings: NotificationSettings(
+        body: body,
+        title: title,
+      ),
+    );
 
-    // Cek AM atau PM
-    return res;
+    await Alarm.set(alarmSettings: alarmSettings);
+  }
+
+  void initAlarm() {
+    if (model.fajr != '') {
+      bool fajr = isTimeBeforeNow(model.fajr.toString());
+      if (fajr) {
+        isAlarmFajr.value = fajr;
+        var alarmDateTime = setDateTimeSchadule(model.fajr.toString());
+        setAlarm(1, alarmDateTime, StringResources.titleFajr,
+            StringResources.bodyFajr);
+      }
+    }
+    if (model.dhuhr != '') {
+      bool dhuhr = isTimeBeforeNow(model.dhuhr.toString());
+      if (dhuhr) {
+        isAlarmDhuhr.value = dhuhr;
+        var alarmDateTime = setDateTimeSchadule(model.dhuhr.toString());
+        setAlarm(2, alarmDateTime, StringResources.titleDhuhr,
+            StringResources.bodyDhuhr);
+      }
+    }
+    if (model.asr != '') {
+      bool asr = isTimeBeforeNow(model.asr.toString());
+      if (asr) {
+        isAlarmAsr.value = asr;
+        var alarmDateTime = setDateTimeSchadule(model.asr.toString());
+        setAlarm(3, alarmDateTime, StringResources.titleAsr,
+            StringResources.bodyAsr);
+      }
+    }
+    if (model.maghrib != '') {
+      bool maghrib = isTimeBeforeNow(model.maghrib.toString());
+      if (maghrib) {
+        isAlarmMaghrib.value = maghrib;
+        var alarmDateTime = setDateTimeSchadule(model.maghrib.toString());
+        setAlarm(4, alarmDateTime, StringResources.titleMaghrib,
+            StringResources.bodyMaghrib);
+      }
+    }
+    if (model.isha != '') {
+      bool isha = isTimeBeforeNow(model.isha.toString());
+      if (isha) {
+        isAlarmIsha.value = isha;
+        var alarmDateTime = setDateTimeSchadule(model.isha.toString());
+        setAlarm(5, alarmDateTime, StringResources.titleIsha,
+            StringResources.bodyIsha);
+      }
+    }
+
+    loadAlarms();
+    setState(() {});
   }
 }

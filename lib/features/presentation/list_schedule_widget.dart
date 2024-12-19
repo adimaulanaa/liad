@@ -108,8 +108,7 @@ class ListScheduleWidget extends StatelessWidget {
               InkWell(
                 splashFactory: NoSplash.splashFactory,
                 highlightColor: Colors.transparent,
-                onTap: () {
-                  alarm.value = !alarm.value; // Toggle status ValueNotifier
+                onTap: () { // Toggle status ValueNotifier
                   onTapAlarm(); // Callback tambahan
                 },
                 child: ValueListenableBuilder<bool>(

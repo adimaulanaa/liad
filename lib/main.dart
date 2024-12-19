@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:liad/core/config/config_resources.dart';
@@ -8,7 +9,6 @@ import 'package:liad/features/onboarding.dart';
 import 'package:liad/firebase_options.dart';
 import 'package:liad/notification_screen.dart';
 import 'package:provider/provider.dart';
-// import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -16,6 +16,8 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   tz.initializeTimeZones();
+  await Alarm.init();
+  // await AndroidAlarmManager.initialize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
