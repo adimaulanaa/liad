@@ -499,8 +499,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bool maghrib = isTimeBeforeNow(model.maghrib.toString());
       if (maghrib) {
         isAlarmMaghrib.value = maghrib;
-        // var alarmDateTime = setDateTimeSchadule(model.maghrib.toString());
-        var alarmDateTime = setDateTimeSchadule('16:30');
+        var alarmDateTime = setDateTimeSchadule(model.maghrib.toString());
         setAlarm(4, alarmDateTime, StringResources.titleMaghrib,
             StringResources.bodyMaghrib);
       }
