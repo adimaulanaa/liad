@@ -12,17 +12,14 @@ class FirebaseApi {
   // function to initialize notification
   Future<void> initNotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    DateTime now = DateTime.now();
-    double latitude = -1.003189; // Default latitude
-    double longitude = 101.972332; // Default longitude
     try {
       // Mendapatkan token FCM
       final fCMToken = await _firebaseMessaging.getToken();
       final CollectionReference myStore =
           FirebaseFirestore.instance.collection("Users");
-      final CollectionReference myProfile =
-          FirebaseFirestore.instance.collection("Profile");
-
+      double latitude = -1.003189; // Default latitude
+      double longitude = 101.972332; // Default longitude
+      DateTime now = DateTime.now();
       await _firebaseMessaging.requestPermission();
       await prefs.setString('token', fCMToken ?? '');
 
@@ -35,6 +32,14 @@ class FirebaseApi {
         await prefs.setString('devicesId', deviceId);
       }
 
+      // Jika fCMToken kosong, hentikan proses
+      if (fCMToken == null) {
+        return;
+      }
+
+      // Menampilkan debug token
+      // ignore: avoid_print
+      print('fCMToken : $fCMToken');
       // Memeriksa status GPS dan izin lokasi
       bool isGpsEnabled = await LocationService.isGpsEnabled();
       bool isPermissionGranted = await LocationService.requestPermission();
@@ -45,16 +50,6 @@ class FirebaseApi {
         latitude = position.latitude;
         longitude = position.longitude;
       }
-
-      // Jika fCMToken kosong, hentikan proses
-      if (fCMToken == null) {
-        return;
-      }
-
-      // Menampilkan debug token
-      // ignore: avoid_print
-      print('fCMToken : $fCMToken');
-
       // Mencari apakah deviceId sudah ada di Firestore
       QuerySnapshot querySnapshot =
           await myStore.where('name', isEqualTo: deviceId).get();
@@ -78,7 +73,38 @@ class FirebaseApi {
           'created': now.toString(),
         });
       }
+    } catch (e) {
+      // Menangani error jika ada
+      // ignore: avoid_print
+      print('Gagal menambahkan atau memperbarui data di Firestore: $e');
+    }
+  }
 
+  Future<void> initProfile() async {
+    double latitude = -1.003189; // Default latitude
+    double longitude = 101.972332; // Default longitude
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final CollectionReference myProfile =
+        FirebaseFirestore.instance.collection("Profile");
+    DateTime now = DateTime.now();
+    // Mengambil deviceId dari SharedPreferences
+    String? deviceId = prefs.getString('devicesId');
+    // Jika deviceId belum ada, ambil dan simpan ke SharedPreferences
+    if (deviceId == null) {
+      deviceId = await getDeviceId();
+      await prefs.setString('devicesId', deviceId);
+    }
+    try {
+      // Memeriksa status GPS dan izin lokasi
+      bool isGpsEnabled = await LocationService.isGpsEnabled();
+      bool isPermissionGranted = await LocationService.requestPermission();
+      // Mendapatkan lokasi menggunakan LocationService
+      if (isGpsEnabled && isPermissionGranted) {
+        // Jika GPS hidup dan akses diberikan, ambil lokasi
+        Position position = await LocationService.getCurrentLocation();
+        latitude = position.latitude;
+        longitude = position.longitude;
+      }
       // profile
       QuerySnapshot profileSnapshot =
           await myProfile.where('devices_id', isEqualTo: deviceId).get();
@@ -103,7 +129,55 @@ class FirebaseApi {
         });
       }
     } catch (e) {
-      // Menangani error jika ada
+      // ignore: avoid_print
+      print('Gagal menambahkan atau memperbarui data di Firestore: $e');
+    }
+  }
+
+  Future<void> initPrays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final CollectionReference myPrays =
+        FirebaseFirestore.instance.collection("Prays");
+    // Mengambil deviceId dari SharedPreferences
+    String? deviceId = prefs.getString('devicesId');
+    // Jika deviceId belum ada, ambil dan simpan ke SharedPreferences
+    if (deviceId == null) {
+      deviceId = await getDeviceId();
+      await prefs.setString('devicesId', deviceId);
+    }
+    try {
+      QuerySnapshot praysSnapshot = await myPrays
+          .where('devices_id', isEqualTo: deviceId)
+          .where('timestamp',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(getDataForToday(true)))
+          .where('timestamp',
+              isLessThanOrEqualTo: Timestamp.fromDate(getDataForToday(false)))
+          .get();
+
+      // Jika tidak ada data, tambahkan data baru
+      if (praysSnapshot.docs.isEmpty) {
+        await prefs.setBool('loadAlarm', true);
+        await myPrays.add({
+          'devices_id': deviceId,
+          'timestamp': Timestamp.fromDate(DateTime.now()),
+          'finish_asr': '',
+          'finish_dhuhr': '',
+          'finish_fajr': '',
+          'finish_isya': '',
+          'finish_maghrib': '',
+          'is_asr': false,
+          'is_dhuhr': false,
+          'is_fajr': false,
+          'is_isya': false,
+          'is_maghrib': false,
+          'on_asr': '',
+          'on_dhuhr': '',
+          'on_fajr': '',
+          'on_isya': '',
+          'on_maghrib': '',
+        });
+      }
+    } catch (e) {
       // ignore: avoid_print
       print('Gagal menambahkan atau memperbarui data di Firestore: $e');
     }
@@ -149,6 +223,19 @@ class FirebaseApi {
       await prefs.setBool('isMaghrib', false);
       await prefs.setBool('isIsha', false);
       await prefs.setString('today', now.toString());
+    }
+  }
+
+  DateTime getDataForToday(bool type) {
+    DateTime now = DateTime.now(); // Tanggal dan waktu saat ini
+
+    if (type) {
+      DateTime startOfDay = DateTime(now.year, now.month, now.day); // Awal hari
+      return startOfDay;
+    } else {
+      DateTime endOfDay =
+          DateTime(now.year, now.month, now.day, 23, 59, 59); // Akhir hari
+      return endOfDay;
     }
   }
 }

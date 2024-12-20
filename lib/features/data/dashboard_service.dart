@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +52,39 @@ class DashboardService {
     } catch (e) {
       throw Exception('Error: $e');
     }
+  }
+
+  Future<PraysModel> getPrays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    PraysModel model = PraysModel();
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Prays");
+    try {
+      String? deviceId = prefs.getString('devicesId');
+      DateTime startOfDay = DateTime(now.year, now.month, now.day); // Awal hari
+      DateTime endOfDay =
+          DateTime(now.year, now.month, now.day, 23, 59, 59); // Akhir hari
+      QuerySnapshot praysSnapshot = await myStore
+          .where('devices_id', isEqualTo: deviceId)
+          .where('timestamp',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+          .where('timestamp', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
+          .get();
+      if (praysSnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = praysSnapshot.docs.first;
+        model = PraysModel.fromJson(doc.data() as Map<String, dynamic>);
+        model.id = doc.id;
+        model.isEmpty = false;
+        return model;
+      } else {
+        return model;
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+    }
+    return model;
   }
 
   Future<String> getLocationOSM(double latitude, double longitude) async {
@@ -229,7 +263,8 @@ class DashboardService {
       String name = '';
       DocumentSnapshot docSnapshot = await myStore.doc(nameId).get();
       if (docSnapshot.exists) {
-        ProfileModel model = ProfileModel.fromMap(docSnapshot.data() as Map<String, dynamic>);
+        ProfileModel model =
+            ProfileModel.fromMap(docSnapshot.data() as Map<String, dynamic>);
         name = model.name.toString();
       }
       if (name != '') {
@@ -247,5 +282,61 @@ class DashboardService {
       print('Gagal : $e');
     }
     return '';
+  }
+
+  Future<void> updateFinishPray(int type, bool value, String id, pray) async {
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Prays");
+    DateTime now = DateTime.now();
+    // Logika untuk menentukan field berdasarkan `type`
+    Map<String, dynamic> updateData = {};
+    String time = '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+    switch (type) {
+      case 1: // Fajr
+        updateData = {
+          'is_fajr': value,
+          'on_fajr': pray,
+          'finish_fajr': time,
+        };
+        break;
+      case 2: // Dhuhr
+        updateData = {
+          'is_dhuhr': value,
+          'on_dhuhr': pray,
+          'finish_dhuhr': time,
+        };
+        break;
+      case 3: // Asr
+        updateData = {
+          'is_asr': value,
+          'on_asr': pray,
+          'finish_asr': time,
+        };
+        break;
+      case 4: // Maghrib
+        updateData = {
+          'is_maghrib': value,
+          'on_maghrib': pray,
+          'finish_maghrib': time,
+        };
+        break;
+      case 5: // Isya
+        updateData = {
+          'is_isya': value,
+          'on_isya': pray,
+          'finish_isya': time,
+        };
+        break;
+      default:
+        return; // Keluar jika type tidak valid
+    }
+    try {
+      await myStore.doc(id).update({
+        ...updateData,
+      });
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal memperbarui data: $e');
+    }
   }
 }

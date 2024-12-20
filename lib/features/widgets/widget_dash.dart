@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:liad/core/config/config_resources.dart';
+import 'package:liad/core/media/media_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String getDayName() {
@@ -70,25 +72,76 @@ DateTime setDateTimeSchadule(String time) {
   return givenTime;
 }
 
+Future<void> setValueSchadule(int type, bool value) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (type == 1) {
+    await prefs.setBool('isFajr', value);
+  } else if (type == 2) {
+    await prefs.setBool('isDhuhr', value);
+  } else if (type == 3) {
+    await prefs.setBool('isAsr', value);
+  } else if (type == 4) {
+    await prefs.setBool('isMaghrib', value);
+  } else if (type == 5) {
+    await prefs.setBool('isIsha', value);
+  }
+}
 
+Future<String> getName() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String myName = prefs.getString('myname') ?? StringResources.myName;
+  return myName;
+}
 
-  Future<void> setValueSchadule(int type, bool value)  async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (type == 1) {
-      await prefs.setBool('isFajr', value);
-    } else if (type == 2) {
-      await prefs.setBool('isDhuhr', value);
-    } else if (type == 3) {
-      await prefs.setBool('isAsr', value);
-    } else if (type == 4) {
-      await prefs.setBool('isMaghrib', value);
-    } else if (type == 5) {
-      await prefs.setBool('isIsha', value);
-    }
+/// Menghitung waktu yang tersisa menuju waktu sholat
+String getRemainingTime(String prayerTime, DateTime currentTime) {
+  // Ambil jam dan menit dari waktu sholat, misalnya "12:30"
+  List<String> prayerTimeParts = prayerTime.split(":");
+  int prayerHour = int.parse(prayerTimeParts[0]);
+  int prayerMinute = int.parse(prayerTimeParts[1]);
+
+  // Waktu sholat dalam objek DateTime
+  DateTime prayerDateTime = DateTime(
+    currentTime.year,
+    currentTime.month,
+    currentTime.day,
+    prayerHour,
+    prayerMinute,
+  );
+
+  // Jika waktu sholat sudah lewat, tambahkan sehari
+  if (prayerDateTime.isBefore(currentTime)) {
+    prayerDateTime = prayerDateTime.add(const Duration(days: 1));
   }
 
-  Future<String> getName() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String myName = prefs.getString('myname') ?? StringResources.myName;
-    return myName;
-  }
+  // Menghitung selisih waktu
+  Duration remainingDuration = prayerDateTime.difference(currentTime);
+
+  // Mengonversi durasi menjadi format jam:menit:detik
+  String remainingTime = formatDuration(remainingDuration);
+  return "Next Prayer in : $remainingTime";
+}
+
+Center noData(bool isSholatFinish) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: isSholatFinish
+          ? Text(
+              'Jadwal sholat hari ini \nsudah selesai',
+              textAlign: TextAlign.center,
+              style: whiteTextstyle.copyWith(
+                fontSize: 20,
+                fontWeight: bold,
+              ),
+            )
+          : Text(
+              'Data tidak tersedia',
+              style: whiteTextstyle.copyWith(
+                fontSize: 20,
+                fontWeight: bold,
+              ),
+            ),
+    ),
+  );
+}

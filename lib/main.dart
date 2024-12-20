@@ -23,6 +23,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseApi().initNotifications();
+  await FirebaseApi().initProfile();
+  await FirebaseApi().initPrays();
   await FirebaseApi().initScheduleSholat();
   final prefs = await SharedPreferences.getInstance();
   // runApp(const MyApp());
