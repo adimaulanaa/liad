@@ -251,8 +251,100 @@ void showSnackbars(BuildContext context, String message, int isSuccess) {
           fontWeight: light,
         ),
       ),
-      backgroundColor:isSuccess == 1 ? Colors.green : isSuccess == 2 ? Colors.red : Colors.yellow,
+      backgroundColor: isSuccess == 1
+          ? Colors.green
+          : isSuccess == 2
+              ? Colors.red
+              : Colors.yellow,
       duration: const Duration(seconds: 2),
+    ),
+  );
+}
+
+Padding listPrays(Size size, String title, schadule, prays) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 13,
+              height: 13,
+              decoration: const BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+            ),
+            // Garis
+            Container(
+              width: 2,
+              height: 40,
+              color: Colors.blue,
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: blackTextstyle.copyWith(
+                  fontSize: 15,
+                  fontWeight: bold,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Jadwal : ',
+                        style: blackTextstyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: medium,
+                        ),
+                      ),
+                      Text(
+                        schadule,
+                        style: blackTextstyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: medium,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: size.width * 0.1),
+                  Row(
+                    children: [
+                      Text(
+                        'Sholat : ',
+                        style: blackTextstyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: medium,
+                        ),
+                      ),
+                      Text(
+                        prays,
+                        style: blackTextstyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: medium,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     ),
   );
 }

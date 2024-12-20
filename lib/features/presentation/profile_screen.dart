@@ -7,6 +7,7 @@ import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
 import 'package:liad/core/utils/loading.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
+import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/presentation/dashboard_screen.dart';
 import 'package:liad/features/widgets/profile_widget.dart';
@@ -25,10 +26,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final loveController = TextEditingController();
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   String myName = '';
+  bool isData = false;
 
   UpdateNameModel updateName = UpdateNameModel();
   UpdateNameModel updateConnect = UpdateNameModel();
   ProfileModel profile = ProfileModel();
+  PraysModel prays = PraysModel();
 
   @override
   void initState() {
@@ -105,94 +108,128 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   SafeArea bodyData(Size size, BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: [
-          SizedBox(height: size.height * 0.05),
-          Center(
-            child: ClipOval(
-              child: Image.asset(
-                MediaRes.alarmBackground,
-                width: size.width * 0.25,
-                height: size.width * 0.25,
-                fit: BoxFit.cover,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: size.height * 0.05),
+            Center(
+              child: ClipOval(
+                child: Image.asset(
+                  MediaRes.alarmBackground,
+                  width: size.width * 0.25,
+                  height: size.width * 0.25,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: size.height * 0.05),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                myName,
-                style: blackTextstyle.copyWith(
-                  fontSize: 20,
-                  fontWeight: bold,
-                ),
-              ),
-              const SizedBox(width: 10),
-              InkWell(
-                splashFactory: NoSplash.splashFactory,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  changeName(
-                    context,
-                    size,
-                    nameController,
-                    () {
-                      Navigator.pop(context);
-                      isLoading.value = true;
-                      updateNames();
-                    },
-                  );
-                },
-                child: SvgPicture.asset(
-                  MediaRes.pencils,
-                  fit: BoxFit.contain,
-                  width: 20,
-                  // ignore: deprecated_member_use
-                  color: AppColors.bgBlack,
-                ),
-              )
-            ],
-          ),
-          SizedBox(height: size.height * 0.05),
-          InkWell(
-            splashFactory: NoSplash.splashFactory,
-            highlightColor: Colors.transparent,
-            onTap: () {
-              connectPartner(
-                context,
-                size,
-                loveController,
-                () {
-                  Navigator.pop(context);
-                  isLoading.value = true;
-                  updateConnects();
-                },
-              );
-            },
-            child: Align(
-              alignment: Alignment.center,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.primary,
-                ),
-                child: Text(
-                  connect(profile.connectName.toString()),
-                  style: whiteTextstyle.copyWith(
-                    fontSize: 15,
+            SizedBox(height: size.height * 0.05),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  myName,
+                  style: blackTextstyle.copyWith(
+                    fontSize: 20,
                     fontWeight: bold,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    changeName(
+                      context,
+                      size,
+                      nameController,
+                      () {
+                        Navigator.pop(context);
+                        isLoading.value = true;
+                        updateNames();
+                      },
+                    );
+                  },
+                  child: SvgPicture.asset(
+                    MediaRes.pencils,
+                    fit: BoxFit.contain,
+                    width: 20,
+                    // ignore: deprecated_member_use
+                    color: AppColors.bgBlack,
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: size.height * 0.05),
+            InkWell(
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                connectPartner(
+                  context,
+                  size,
+                  loveController,
+                  () {
+                    Navigator.pop(context);
+                    isLoading.value = true;
+                    updateConnects();
+                  },
+                );
+              },
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: AppColors.primary,
+                  ),
+                  child: Text(
+                    connect(profile.connectName.toString()),
+                    style: whiteTextstyle.copyWith(
+                      fontSize: 15,
+                      fontWeight: bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            SizedBox(height: size.height * 0.05),
+            Text(
+              'Your Connect Pray',
+              style: blackTextstyle.copyWith(
+                fontSize: 15,
+                fontWeight: bold,
+              ),
+            ),
+            SizedBox(height: size.height * 0.01),
+            isData ? _prays(size) : const SizedBox.shrink(),
+          ],
+        ),
       ),
+    );
+  }
+
+  Column _prays(Size size) {
+    return Column(
+      children: [
+        prays.isFajr!
+            ? listPrays(size, 'Fajr', prays.onFajr, prays.finishFajr)
+            : const SizedBox.shrink(),
+        prays.isDhuhr!
+            ? listPrays(size, 'Dhuhr', prays.onDhuhr, prays.finishDhuhr)
+            : const SizedBox.shrink(),
+        prays.isAsr!
+            ? listPrays(size, 'Asr', prays.onAsr, prays.finishAsr)
+            : const SizedBox.shrink(),
+        prays.isMaghrib!
+            ? listPrays(size, 'Maghrib', prays.onMaghrib, prays.finishMaghrib)
+            : const SizedBox.shrink(),
+        prays.isIsya!
+            ? listPrays(size, 'Isha', prays.onIsya, prays.finishIsya)
+            : const SizedBox.shrink(),
+      ],
     );
   }
 
@@ -205,7 +242,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void getData() async {
+    final provider = Provider.of<DashboardProvider>(context, listen: false);
     myName = await getName();
+    prays = await provider.loadPrays();
+    if (prays.id != '') {
+      isData = true;
+    }
     setState(() {});
   }
 
