@@ -347,19 +347,12 @@ class DashboardService {
     switch (type) {
       case 1: // Fajr
         updateData = {
-          'lat_current_weather': lat,
-          'long_current_weather': long,
-          'timstamp': now.toString(),
-        };
-        break;
-      case 2: // Dhuhr
-        updateData = {
           'lat_work_weather': lat,
           'long_work_weather': long,
           'timstamp': now.toString(),
         };
         break;
-      case 3: // Asr
+      case 2: // Dhuhr
         updateData = {
           'lat_home_weather': lat,
           'long_home_weather': long,
