@@ -26,6 +26,8 @@ class StringResources {
   //! Profile 
   static const String changeName = "Update Nama";  
   static const String connectPatner = "Your ID Love";  
+  static const String yourIdLocation = "Your ID Location";  
+  static const String yourIdLocationNote = "Note: setelah anda cari kode wilayah anda, ID wilayah akan ada di link browser yang anda buka.";  
 
 
 }

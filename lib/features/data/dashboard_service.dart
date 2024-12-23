@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
+import 'package:liad/features/model/weather_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardService {
@@ -85,6 +86,60 @@ class DashboardService {
       print('Gagal : $e');
     }
     return model;
+  }
+
+  Future<Cuaca> getWeather(String id) async {
+    final url = 'https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=$id';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Parsing data ke WeatherModel
+        final weatherModel = WeatherModel.fromJson(data);
+
+        // Mendapatkan waktu sekarang
+        final now = DateTime.now();
+
+        // Mengambil daftar Cuaca yang sesuai dengan tanggal hari ini
+        List<Cuaca> cuacaList = [];
+        if (weatherModel.data != null) {
+          for (var weatherDetail in weatherModel.data!) {
+            if (weatherDetail.cuaca != null) {
+              for (var cuacaItem in weatherDetail.cuaca!) {
+                cuacaList.addAll(
+                  cuacaItem.where((cuaca) =>
+                      cuaca.localDatetime != null &&
+                      DateFormat('yyyy-MM-dd').format(cuaca.localDatetime!) ==
+                          DateFormat('yyyy-MM-dd').format(now)),
+                );
+              }
+            }
+          }
+        }
+
+        // Jika ada data cuaca hari ini, cari data berdasarkan waktu terdekat
+        if (cuacaList.isNotEmpty) {
+          // Urutkan berdasarkan selisih waktu
+          cuacaList.sort((a, b) {
+            final diffA = a.localDatetime!.difference(now).abs();
+            final diffB = b.localDatetime!.difference(now).abs();
+            return diffA.compareTo(diffB);
+          });
+
+          // Ambil data cuaca terdekat
+          return cuacaList.first;
+        }
+
+        return Cuaca();
+      } else {
+        throw Exception("Failed to load weather data");
+      }
+    } catch (e) {
+      throw Exception("Error fetching weather data");
+    }
   }
 
   Future<String> getLocationOSM(double latitude, double longitude) async {
@@ -280,6 +335,48 @@ class DashboardService {
     } catch (e) {
       // ignore: avoid_print
       print('Gagal : $e');
+    }
+    return '';
+  }
+
+  Future<String> updateWeather(int type, String id, lat, long) async {
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Profile");
+    DateTime now = DateTime.now();
+    Map<String, dynamic> updateData = {};
+    switch (type) {
+      case 1: // Fajr
+        updateData = {
+          'lat_current_weather': lat,
+          'long_current_weather': long,
+          'timstamp': now.toString(),
+        };
+        break;
+      case 2: // Dhuhr
+        updateData = {
+          'lat_work_weather': lat,
+          'long_work_weather': long,
+          'timstamp': now.toString(),
+        };
+        break;
+      case 3: // Asr
+        updateData = {
+          'lat_home_weather': lat,
+          'long_home_weather': long,
+          'timstamp': now.toString(),
+        };
+        break;
+      default:
+        return '';
+    }
+    try {
+      await myStore.doc(id).update({
+        ...updateData,
+      });
+      return 'Berhasil';
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal memperbarui data: $e');
     }
     return '';
   }

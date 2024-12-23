@@ -1,7 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_text.dart';
+import 'package:liad/features/model/weather_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<dynamic> changeName(
   BuildContext context,
@@ -223,6 +227,161 @@ Future<dynamic> connectPartner(
   );
 }
 
+Future<dynamic> inputWeather(
+  BuildContext context,
+  Size size,
+  TextEditingController weather,
+  VoidCallback onTap,
+) {
+  return showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.bgScreen,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(20.0),
+      ),
+    ),
+    builder: (BuildContext context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          height: size.height * 0.31,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text(
+                "Input Id wilayahmu",
+                style: blackTextstyle.copyWith(
+                  fontSize: 20,
+                  fontWeight: bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              RichText(
+                text: TextSpan(
+                  style: blackTextstyle.copyWith(
+                    fontSize: 14,
+                    fontWeight: medium,
+                  ),
+                  children: [
+                    const TextSpan(
+                      text: "Cari id wilayahmu di link: ",
+                    ),
+                    TextSpan(
+                      text: "https://kodewilayah.id/",
+                      style: transTextstyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: medium,
+                        color: AppColors.primary,
+                      ),
+                      recognizer: TapGestureRecognizer()..onTap = _launchUrl,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                StringResources.yourIdLocationNote,
+                style: greyTextstyle.copyWith(
+                  fontSize: 7,
+                  fontWeight: bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: weather,
+                decoration: InputDecoration(
+                  hintText: StringResources.yourIdLocation,
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 13.0),
+                  hintStyle: transTextstyle.copyWith(
+                    fontSize: 15,
+                    color: AppColors.bgGrey,
+                    fontWeight: semiBold,
+                  ),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: AppColors.tertiary,
+                    ),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                style: blackTextstyle.copyWith(
+                  fontSize: 15,
+                  fontWeight: semiBold,
+                ),
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+                onTap: () {
+                  try {
+                    Navigator.pop(context);
+                    onTap();
+                  } catch (e) {
+                    // print('Error saat menyimpan data: $e');
+                  }
+                },
+                child: Container(
+                  // width: size.width * 0.25,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.primary,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Simpan',
+                      style: whiteTextstyle.copyWith(
+                        fontSize: 19,
+                        fontWeight: bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Future<void> _launchUrl() async {
+  final Uri url = Uri.parse('https://kodewilayah.id/');
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
+  }
+}
+
 void showSnackbar(BuildContext context, String message, bool isSuccess) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -346,5 +505,96 @@ Padding listPrays(Size size, String title, schadule, prays) {
         ),
       ],
     ),
+  );
+}
+
+Column viewWeather(Size size, String text) {
+  return Column(
+    children: [
+      Container(
+        width: size.width * 0.28,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.primary,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          'Update \nLocation \n$text',
+          style: blackTextstyle.copyWith(
+            fontSize: 12,
+            fontWeight: bold,
+          ),
+        ),
+      ),
+      const SizedBox(height: 5),
+      Text(
+        text,
+        style: blackTextstyle.copyWith(
+          fontSize: 12,
+          fontWeight: bold,
+        ),
+      ),
+    ],
+  );
+}
+
+Column viewDtWeather(Size size, Cuaca modelWe, String text) {
+  return Column(
+    children: [
+      Container(
+        width: size.width * 0.28,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.primary,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                SvgPicture.network(
+                  modelWe.image.toString(),
+                  width: size.width * 0.1,
+                  placeholderBuilder: (BuildContext context) =>
+                      const CircularProgressIndicator(),
+                ),
+                Text(
+                  modelWe.weatherDesc ?? '',
+                  style: blackTextstyle.copyWith(
+                    fontSize: 9,
+                    fontWeight: bold,
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Text(
+                '${modelWe.t ?? ''}°C',
+                style: blackTextstyle.copyWith(
+                  fontSize: 9,
+                  fontWeight: bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 5),
+      Text(
+        text,
+        style: blackTextstyle.copyWith(
+          fontSize: 12,
+          fontWeight: bold,
+        ),
+      ),
+    ],
   );
 }

@@ -9,6 +9,7 @@ import 'package:liad/core/utils/loading.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
+import 'package:liad/features/model/weather_model.dart';
 import 'package:liad/features/presentation/dashboard_screen.dart';
 import 'package:liad/features/widgets/profile_widget.dart';
 import 'package:liad/features/widgets/widget_dash.dart';
@@ -24,14 +25,20 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final nameController = TextEditingController();
   final loveController = TextEditingController();
+  final weatherController = TextEditingController();
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   String myName = '';
   bool isData = false;
+  bool isDtWWork = false;
+  bool isDtWHome = false;
 
   UpdateNameModel updateName = UpdateNameModel();
   UpdateNameModel updateConnect = UpdateNameModel();
+  UpdateNameModel updateWeater = UpdateNameModel();
   ProfileModel profile = ProfileModel();
   PraysModel prays = PraysModel();
+  Cuaca homeWeater = Cuaca();
+  Cuaca workWeater = Cuaca();
 
   @override
   void initState() {
@@ -195,16 +202,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            SizedBox(height: size.height * 0.05),
-            Text(
-              'Your Connect Pray',
-              style: blackTextstyle.copyWith(
-                fontSize: 15,
-                fontWeight: bold,
-              ),
+            SizedBox(height: size.height * 0.03),
+            _viewWeather(context, size),
+            isData
+                ? Column(
+                    children: [
+                      SizedBox(height: size.height * 0.05),
+                      Text(
+                        'Your Connect Pray',
+                        style: blackTextstyle.copyWith(
+                          fontSize: 15,
+                          fontWeight: bold,
+                        ),
+                      ),
+                      SizedBox(height: size.height * 0.01),
+                      prays.isFajr!
+                          ? _prays(size)
+                          : Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Text(
+                                'Tidak ada data Pray',
+                                style: greyTextstyle.copyWith(
+                                  fontSize: 12,
+                                  fontWeight: bold,
+                                ),
+                              ),
+                          ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Center _viewWeather(BuildContext context, Size size) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            InkWell(
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                inputWeather(
+                  context,
+                  size,
+                  weatherController,
+                  () {
+                    updateWeather(1);
+                  },
+                );
+              },
+              child: isDtWWork && workWeater.image != null
+                  ? viewDtWeather(size, workWeater, 'Tempat Kerja')
+                  : viewWeather(size, 'Tempat Kerja'),
             ),
-            SizedBox(height: size.height * 0.01),
-            isData ? _prays(size) : const SizedBox.shrink(),
+            SizedBox(width: size.width * 0.1),
+            InkWell(
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                inputWeather(
+                  context,
+                  size,
+                  weatherController,
+                  () {
+                    updateWeather(2);
+                  },
+                );
+              },
+              child: isDtWHome && homeWeater.image != null
+                  ? viewDtWeather(size, homeWeater, 'Rumah')
+                  : viewWeather(size, 'Rumah'),
+            ),
           ],
         ),
       ),
@@ -245,8 +319,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     myName = await getName();
     prays = await provider.loadPrays();
+    String work = await getTypeWeather(1);
+    String home = await getTypeWeather(2);
     if (prays.id != '') {
       isData = true;
+    }
+    if (work.isNotEmpty) {
+      isDtWWork = true;
+      workWeater = await provider.loadWeater(1);
+    }
+    if (home.isNotEmpty) {
+      isDtWHome = true;
+      homeWeater = await provider.loadWeater(2);
     }
     setState(() {});
   }
@@ -279,5 +363,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     isLoading.value = false;
     getProfile();
+  }
+
+  Future<void> updateWeather(int type) async {
+    isLoading.value = true;
+    final provider = Provider.of<DashboardProvider>(context, listen: false);
+    updateWeater =
+        await provider.updateWeather(type, profile.id!, weatherController.text);
+    if (!updateWeater.isError) {
+      weatherController.text = '';
+      workWeater = await provider.loadWeater(type);
+    } else {
+      // ignore: use_build_context_synchronously
+      showSnackbar(context, 'Gagal Update', false);
+    }
+    isLoading.value = false;
+    setState(() {});
   }
 }

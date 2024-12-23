@@ -105,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     isAsr.value = await provider.loadScheduleSholat(3);
     isMaghrib.value = await provider.loadScheduleSholat(4);
     isIsha.value = await provider.loadScheduleSholat(5);
-    initAlarm();
+    // initAlarm();
   }
 
   @override

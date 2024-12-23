@@ -6,6 +6,7 @@ import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/send_notif_model.dart';
+import 'package:liad/features/model/weather_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardProvider extends ChangeNotifier {
@@ -39,6 +40,24 @@ class DashboardProvider extends ChangeNotifier {
       return data;
     } catch (e) {
       return PraysModel(isEmpty: true);
+    }
+  }
+
+  Future<Cuaca> loadWeater(int type) async {
+    Cuaca weater = Cuaca();
+    try {
+      String id = '';
+      if (type == 1) {
+        id = prefs.getString('workWeather') ?? '';
+      } else if (type == 2) {
+        id = prefs.getString('homeWeather') ?? '';
+      }
+       
+      weater = await dataService.getWeather(id);
+      notifyListeners();
+      return weater;
+    } catch (e) {
+      return weater;
     }
   }
 
@@ -156,6 +175,28 @@ class DashboardProvider extends ChangeNotifier {
     try {
       bool isSuc = false;
       String get = await dataService.updateConnect(id, name);
+      if (get == '') {
+        isSuc = true;
+      }
+      notifyListeners();
+      return UpdateNameModel(isError: isSuc, error: get);
+    } catch (e) {
+      return UpdateNameModel(isError: true, error: e.toString());
+    }
+  }
+
+  Future<UpdateNameModel> updateWeather(int type, String id, name) async {
+    try {
+      bool isSuc = false;
+      Position position = await LocationService.getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+      if (type == 1) {
+        await prefs.setString('workWeather', name);
+      } else if (type == 2) {
+        await prefs.setString('homeWeather', name);
+      }
+      String get = await dataService.updateWeather(type, id, latitude, longitude);
       if (get == '') {
         isSuc = true;
       }

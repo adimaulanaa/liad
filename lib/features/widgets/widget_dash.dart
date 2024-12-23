@@ -93,6 +93,17 @@ Future<String> getName() async {
   return myName;
 }
 
+Future<String> getTypeWeather(int type) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String data = '';
+  if (type == 1) {
+    data = prefs.getString('workWeather') ?? '';
+  } else if (type == 2) {
+    data = prefs.getString('homeWeather') ?? '';
+  }
+  return data;
+}
+
 /// Menghitung waktu yang tersisa menuju waktu sholat
 String getRemainingTime(String prayerTime, DateTime currentTime) {
   // Ambil jam dan menit dari waktu sholat, misalnya "12:30"
