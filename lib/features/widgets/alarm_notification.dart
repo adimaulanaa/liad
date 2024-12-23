@@ -34,6 +34,13 @@ class _AlarmNotificationScreenState extends State<AlarmNotificationScreen> {
     formattedTime =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     getNames();
+
+    // Menambahkan logika untuk otomatis mematikan alarm setelah 30 detik
+    Future.delayed(const Duration(seconds: 30), () {
+      if (mounted) {
+        stop();
+      }
+    });
   }
 
   @override
@@ -90,11 +97,7 @@ class _AlarmNotificationScreenState extends State<AlarmNotificationScreen> {
                   splashFactory: NoSplash.splashFactory,
                   highlightColor: Colors.transparent,
                   onTap: () {
-                    //stop alarm
-                    setValueSchadule(widget.alarmSettings.id, true);
-                    Alarm.stop(widget.alarmSettings.id)
-                        // ignore: use_build_context_synchronously
-                        .then((_) => Navigator.pop(context));
+                    stop();
                   },
                   child: Container(
                     width: size.width * 0.25,
@@ -163,5 +166,13 @@ class _AlarmNotificationScreenState extends State<AlarmNotificationScreen> {
 
   void getNames() async {
     myName = await getName();
+  }
+
+  void stop() {
+    //stop alarm
+    setValueSchadule(widget.alarmSettings.id, true);
+    Alarm.stop(widget.alarmSettings.id)
+        // ignore: use_build_context_synchronously
+        .then((_) => Navigator.pop(context));
   }
 }
