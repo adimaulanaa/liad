@@ -7,3 +7,13 @@ class SendNotifModel {
     this.error = '',
   });
 }
+
+class ResponseNotes {
+  bool isSucces;
+  String message;
+
+  ResponseNotes({
+    this.isSucces = false,
+    this.message = '',
+  });
+}

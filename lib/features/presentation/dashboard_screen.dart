@@ -13,6 +13,7 @@ import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/presentation/list_schedule_widget.dart';
+import 'package:liad/features/presentation/notes/notes_screen.dart';
 import 'package:liad/features/presentation/profile_screen.dart';
 import 'package:liad/features/widgets/alarm_notification.dart';
 import 'package:liad/features/widgets/sholat_content_widget.dart';
@@ -151,6 +152,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: isLoading
           ? const UIDialogLoading(text: StringResources.loading)
           : bodyData(context, size),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NotesScreen(),
+            ),
+          );
+        },
+        backgroundColor: AppColors.primary,
+        shape: const CircleBorder(),
+        child: SvgPicture.asset(
+          MediaRes.listNote,
+          fit: BoxFit.contain,
+          width: 30,
+          // ignore: deprecated_member_use
+          color: AppColors.bgColor,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 

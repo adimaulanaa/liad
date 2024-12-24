@@ -5,6 +5,9 @@ import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/firebase/firebase_api.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/data/dashboard_service.dart';
+import 'package:liad/features/data/notes/database_service.dart';
+import 'package:liad/features/data/notes/notes_provider.dart';
+import 'package:liad/features/data/notes/notes_service.dart';
 import 'package:liad/features/onboarding.dart';
 import 'package:liad/firebase_options.dart';
 import 'package:liad/notification_screen.dart';
@@ -27,11 +30,25 @@ void main() async {
   await FirebaseApi().initPrays();
   await FirebaseApi().initScheduleSholat();
   final prefs = await SharedPreferences.getInstance();
+  // Inisialisasi NotesDatabaseService
+  final notesDatabase = NotesDatabaseService();
   // runApp(const MyApp());
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => DashboardProvider(dataService: DashboardService(), prefs: prefs)),
+        ChangeNotifierProvider(
+          create: (_) => DashboardProvider(
+            dataService: DashboardService(),
+            prefs: prefs,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NotesProvider(
+            dataService: NotesService(),
+            prefs: prefs,
+            notesDatabase: notesDatabase,
+          ),
+        ),
       ],
       child: const MyApp(),
     ),

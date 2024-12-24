@@ -22,4 +22,13 @@ class MediaRes {
   static const pencils = '$_baseIcon/pencil.svg';
   static const path = '$_baseIcon/path.svg';
   static const alarm = '$_baseIcon/alarm.svg';
+
+  //! Notes
+  static const listNote = '$_baseIcon/notebook.svg';
+  static const notes = '$_baseIcon/note.svg';
+  static const editNotes = '$_baseIcon/note-edit.svg';
+  static const searchNotes = '$_baseIcon/note-search.svg';
+  static const close = '$_baseIcon/close.svg';
+  static const checklistNote = '$_baseIcon/checklist-notes.svg';
+  
 }
