@@ -22,7 +22,7 @@ class ViewNotes extends StatefulWidget {
 }
 
 class _ViewNotesState extends State<ViewNotes> {
-  final ValueNotifier<bool> isLoading = ValueNotifier(false);
+  final ValueNotifier<bool> isLoading = ValueNotifier(true);
   FocusNode titleFocus = FocusNode();
   FocusNode contentFocus = FocusNode();
   DateTime dates = DateTime.now();
@@ -43,8 +43,9 @@ class _ViewNotesState extends State<ViewNotes> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: AppColors.bgColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgGreySecond,
+        backgroundColor: AppColors.bgColor,
         centerTitle: true,
         title: Text(
           'Notes',
@@ -267,6 +268,10 @@ class _ViewNotesState extends State<ViewNotes> {
         finish = 'Selesai';
         isFinish = true;
       }
+      isLoading.value = false;
     }
+    setState(() {
+      
+    });
   }
 }
