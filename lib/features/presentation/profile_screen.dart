@@ -9,6 +9,7 @@ import 'package:liad/core/utils/loading.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
+import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/weather_model.dart';
 import 'package:liad/features/presentation/dashboard_screen.dart';
 import 'package:liad/features/widgets/profile_widget.dart';
@@ -27,14 +28,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final loveController = TextEditingController();
   final weatherController = TextEditingController();
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmFajr = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmDhuhr = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmAsr = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmMaghrib = ValueNotifier(false);
+  final ValueNotifier<bool> isAlarmIsha = ValueNotifier(false);
   String myName = '';
+  String selectedDates = '';
   bool isData = false;
   bool isDtWWork = false;
   bool isDtWHome = false;
+  DateTime? selectedDate;
 
   UpdateNameModel updateName = UpdateNameModel();
   UpdateNameModel updateConnect = UpdateNameModel();
   UpdateNameModel updateWeater = UpdateNameModel();
+  UpdateNameModel updateAlarm = UpdateNameModel();
+  ScheduleSholatModel schadulePray = ScheduleSholatModel();
   ProfileModel profile = ProfileModel();
   PraysModel prays = PraysModel();
   Cuaca homeWeater = Cuaca();
@@ -84,6 +94,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
+          InkWell(
+            splashFactory: NoSplash.splashFactory,
+            highlightColor: Colors.transparent,
+            onTap: () async {
+              selectedDates = await selectDate(context, selectedDate);
+              setDataAlarm(selectedDates, size);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: SvgPicture.asset(
+                MediaRes.alarm,
+                fit: BoxFit.contain,
+                width: 25,
+                // ignore: deprecated_member_use
+                color: AppColors.bgBlack,
+              ),
+            ),
+          ),
           InkWell(
             splashFactory: NoSplash.splashFactory,
             highlightColor: Colors.transparent,
@@ -219,15 +247,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       prays.isFajr!
                           ? _prays(size)
                           : Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: Text(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Text(
                                 'Tidak ada data Pray',
                                 style: greyTextstyle.copyWith(
                                   fontSize: 12,
                                   fontWeight: bold,
                                 ),
                               ),
-                          ),
+                            ),
                     ],
                   )
                 : const SizedBox.shrink(),
@@ -378,6 +406,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       showSnackbar(context, 'Gagal Update', false);
     }
     isLoading.value = false;
+    getData();
+  }
+
+  void setDataAlarm(String selectedDates, Size size) async {
+    isLoading.value = true;
+    final provider = Provider.of<DashboardProvider>(context, listen: false);
+    schadulePray = await provider.loadPrayerSchedule(selectedDates);
+    if (!schadulePray.isError) {
+      await initAlarmProfile(schadulePray, selectedDates);
+      // ignore: use_build_context_synchronously
+      showSnackbar(context, 'Berhasil Menambahkan alarm', true);
+      isLoading.value = false;
+    } else {
+      // ignore: use_build_context_synchronously
+      showSnackbar(context, 'Gagal Update', false);
+    }
     setState(() {});
   }
 }

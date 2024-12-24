@@ -72,6 +72,18 @@ DateTime setDateTimeSchadule(String time) {
   return givenTime;
 }
 
+DateTime setDateTimeSchaduleSecond(String time, date) {
+  // Gabungkan menjadi satu string datetime
+  String dateTimeString = "$date $time";
+
+  // Format sesuai dengan input
+  DateFormat format = DateFormat("dd-MM-yyyy HH:mm");
+
+  // Parse ke DateTime
+  DateTime combinedDateTime = format.parse(dateTimeString);
+  return combinedDateTime;
+}
+
 Future<void> setValueSchadule(int type, bool value) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (type == 1) {

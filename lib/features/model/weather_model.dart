@@ -28,6 +28,11 @@ class WeatherModel {
         "lokasi": lokasi!.toJson(),
         "data": List<dynamic>.from(data!.map((x) => x.toJson())),
       };
+
+  @override
+  String toString() {
+    return 'WeatherModel{lokasi: $lokasi, data: $data}';
+  }
 }
 
 class WeatherDetail {
@@ -50,6 +55,11 @@ class WeatherDetail {
         "cuaca": List<dynamic>.from(
             cuaca!.map((x) => List<dynamic>.from(x.map((x) => x.toJson())))),
       };
+
+  @override
+  String toString() {
+    return 'WeatherDetail{lokasi: $lokasi, cuaca: $cuaca}';
+  }
 }
 
 class Cuaca {
@@ -138,6 +148,11 @@ class Cuaca {
         "utc_datetime": utcDatetime.toString(),
         "local_datetime": localDatetime.toString(),
       };
+
+  @override
+  String toString() {
+    return 'Cuaca{datetime: $datetime, t: $t, tcc: $tcc, tp: $tp, weather: $weather, weatherDesc: $weatherDesc, weatherDescEn: $weatherDescEn, wdDeg: $wdDeg, wd: $wd, wdTo: $wdTo, ws: $ws, hu: $hu, vs: $vs, vsText: $vsText, timeIndex: $timeIndex, analysisDate: $analysisDate, image: $image, utcDatetime: $utcDatetime, localDatetime: $localDatetime}';
+  }
 }
 
 class Lokasi {
@@ -198,4 +213,9 @@ class Lokasi {
         "timezone": timezone,
         "type": type,
       };
+
+  @override
+  String toString() {
+    return 'Lokasi{adm1: $adm1, adm2: $adm2, adm3: $adm3, adm4: $adm4, provinsi: $provinsi, kotkab: $kotkab, kecamatan: $kecamatan, desa: $desa, lon: $lon, lat: $lat, timezone: $timezone, type: $type}';
+  }
 }

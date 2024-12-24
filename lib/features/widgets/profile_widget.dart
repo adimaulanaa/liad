@@ -1,10 +1,14 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_text.dart';
+import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/weather_model.dart';
+import 'package:liad/features/widgets/widget_dash.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<dynamic> changeName(
@@ -597,4 +601,84 @@ Column viewDtWeather(Size size, Cuaca modelWe, String text) {
       ),
     ],
   );
+}
+
+Future<String> selectDate(BuildContext context, DateTime? selectedDate) async {
+  String selected = '';
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: selectedDate ?? DateTime.now(), // Default tanggal awal
+    firstDate: DateTime(2000), // Tanggal awal yang diizinkan
+    lastDate: DateTime(2100), // Tanggal akhir yang diizinkan
+  );
+  if (picked != null && picked != selectedDate) {
+    selected = DateFormat('dd-MM-yyyy').format(picked);
+  }
+  return selected;
+}
+
+Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) async {
+  if (model.fajr != '') {
+    var alarmDateTime = setDateTimeSchaduleSecond(model.fajr.toString(), selectedDates);
+    await setAlarm(
+      1,
+      alarmDateTime,
+      StringResources.titleFajr,
+      StringResources.bodyFajr,
+    );
+  }
+  if (model.dhuhr != '') {
+    var alarmDateTime = setDateTimeSchaduleSecond(model.dhuhr.toString(), selectedDates);
+    await setAlarm(
+      2,
+      alarmDateTime,
+      StringResources.titleDhuhr,
+      StringResources.bodyDhuhr,
+    );
+  }
+  if (model.asr != '') {
+    var alarmDateTime = setDateTimeSchaduleSecond(model.asr.toString(), selectedDates);
+    await setAlarm(
+      3,
+      alarmDateTime,
+      StringResources.titleAsr,
+      StringResources.bodyAsr,
+    );
+  }
+  if (model.maghrib != '') {
+    var alarmDateTime = setDateTimeSchaduleSecond(model.maghrib.toString(), selectedDates);
+    await setAlarm(
+      4,
+      alarmDateTime,
+      StringResources.titleMaghrib,
+      StringResources.bodyMaghrib,
+    );
+  }
+  if (model.isha != '') {
+    var alarmDateTime = setDateTimeSchaduleSecond(model.isha.toString(), selectedDates);
+    await setAlarm(
+      5,
+      alarmDateTime,
+      StringResources.titleIsha,
+      StringResources.bodyIsha,
+    );
+  }
+}
+
+Future<void> setAlarm(int id, DateTime date, String title, String body) async {
+  final alarmSettings = AlarmSettings(
+    id: id,
+    dateTime: date,
+    assetAudioPath: 'assets/ringtone/alarm-tone.mp3',
+    loopAudio: true,
+    vibrate: true,
+    volume: 0.8,
+    fadeDuration: 3.0,
+    notificationSettings: NotificationSettings(
+      body: body,
+      title: title,
+    ),
+  );
+
+  await Alarm.set(alarmSettings: alarmSettings);
 }

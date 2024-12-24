@@ -21,4 +21,5 @@ class MediaRes {
   static const settings = '$_baseIcon/settings.svg';
   static const pencils = '$_baseIcon/pencil.svg';
   static const path = '$_baseIcon/path.svg';
+  static const alarm = '$_baseIcon/alarm.svg';
 }
