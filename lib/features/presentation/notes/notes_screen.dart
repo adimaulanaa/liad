@@ -28,7 +28,7 @@ class _NotesScreenState extends State<NotesScreen> {
   List<NotesModel> allNotes = [];
   List<NotesModel> viewNotes = [];
   ResponseNotes response = ResponseNotes();
-  
+
   @override
   void initState() {
     super.initState();
@@ -195,6 +195,12 @@ class _NotesScreenState extends State<NotesScreen> {
                         isLoading.value = true;
                         updateChecklist(e.id!, check.value);
                       },
+                      onTapDelete: () {
+                        confirmDelete(context, size, e.title.toString(), () {
+                          isLoading.value = true;
+                          _deleteId(e.id.toString());
+                        });
+                      },
                     ),
                   );
                 }).toList(),
@@ -212,6 +218,27 @@ class _NotesScreenState extends State<NotesScreen> {
     viewNotes = allNotes;
     isLoading.value = false;
     setState(() {});
+  }
+
+  void _deleteId(String id) async {
+    final provider = Provider.of<NotesProvider>(context, listen: false);
+    response = await provider.deleteNotes(id);
+    isLoading.value = false;
+    if (response.isSucces) {
+      // ignore: use_build_context_synchronously
+      context.showSuccesSnackBar(
+        response.message,
+        onNavigate: () {
+          _loadData();
+        }, // bottom close
+      );
+    } else {
+      // ignore: use_build_context_synchronously
+      context.showErrorSnackBar(
+        response.message,
+        onNavigate: () {}, // bottom close
+      );
+    }
   }
 
   void search(String value) {
@@ -242,5 +269,122 @@ class _NotesScreenState extends State<NotesScreen> {
       );
     }
     isLoading.value = false;
+  }
+
+  Future<dynamic> confirmDelete(
+    BuildContext context,
+    Size size,
+    String title,
+    VoidCallback onTap,
+  ) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgScreen,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            height: size.height * 0.23,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Text(
+                  'Delete Notes?',
+                  style: blackTextstyle.copyWith(
+                    fontSize: 20,
+                    fontWeight: bold,
+                  ),
+                ),
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: greyTextstyle.copyWith(
+                    fontSize: 15,
+                    fontWeight: medium,
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      splashFactory: NoSplash.splashFactory,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: size.width * 0.45,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.primary,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Batal',
+                            style: whiteTextstyle.copyWith(
+                              fontSize: 19,
+                              fontWeight: bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      splashFactory: NoSplash.splashFactory,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onTap();
+                      },
+                      child: Container(
+                        width: size.width * 0.45,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.primary,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Iya',
+                            style: whiteTextstyle.copyWith(
+                              fontSize: 19,
+                              fontWeight: bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

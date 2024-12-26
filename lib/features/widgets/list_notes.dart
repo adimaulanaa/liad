@@ -11,12 +11,14 @@ class ListNotes extends StatelessWidget {
   final NotesModel dt;
   final ValueNotifier<bool> checkBox;
   final VoidCallback onTapCheckBox;
+  final VoidCallback onTapDelete;
   const ListNotes({
     super.key,
     required this.size,
     required this.dt,
     required this.checkBox,
     required this.onTapCheckBox,
+    required this.onTapDelete,
   });
 
   @override
@@ -25,89 +27,105 @@ class ListNotes extends StatelessWidget {
     String formattedDate = formatDateBasedOnToday(dt.updatedOn!);
     return Container(
       width: (size.width - 40) / 2,
-      height: size.height * 0.2,
+      height: size.height * 0.21,
       decoration: BoxDecoration(
         color: AppColors.bgScreen,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
-                child: Text(
-                  dt.title.toString(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: blackTextstyle.copyWith(
-                    fontSize: 15,
-                    fontWeight: semiBold,
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    dt.title.toString(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: blackTextstyle.copyWith(
+                      fontSize: 15,
+                      fontWeight: semiBold,
+                    ),
                   ),
                 ),
+                InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    onTapDelete(); // Callback tambahan
+                  },
+                  child: SvgPicture.asset(
+                    MediaRes.delete,
+                    // ignore: deprecated_member_use
+                    color: AppColors.bgBlack,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            child: Text(
+              dt.content.toString(),
+              maxLines: 4,
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              style: greyTextstyle.copyWith(
+                fontSize: 13,
+                fontWeight: medium,
               ),
-              const SizedBox(height: 10),
+            ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+                padding: const EdgeInsets.only(left: 15),
                 child: Text(
-                  dt.content.toString(),
-                  maxLines: 4,
+                  formattedDate,
+                  maxLines: 1,
                   textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,
                   style: greyTextstyle.copyWith(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: medium,
                   ),
                 ),
               ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(
-                      formattedDate,
-                      maxLines: 1,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                      style: greyTextstyle.copyWith(
-                        fontSize: 12,
-                        fontWeight: medium,
-                      ),
-                    ),
+              Padding(
+                padding: const EdgeInsets.only(right: 15, bottom: 5),
+                child: InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    checkBox.value =
+                        !checkBox.value; // Toggle status ValueNotifier
+                    onTapCheckBox(); // Callback tambahan
+                  },
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: checkBox,
+                    builder: (context, isEnabled, child) {
+                      return SvgPicture.asset(
+                        MediaRes.checklistNote,
+                        fit: BoxFit.cover,
+                        // ignore: deprecated_member_use
+                        color: isEnabled ? AppColors.primary : Colors.grey,
+                        width: 25,
+                        height: 25,
+                      );
+                    },
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15, bottom: 5),
-                    child: InkWell(
-                      splashFactory: NoSplash.splashFactory,
-                      highlightColor: Colors.transparent,
-                      onTap: () {
-                        checkBox.value =
-                            !checkBox.value; // Toggle status ValueNotifier
-                        onTapCheckBox(); // Callback tambahan
-                      },
-                      child: ValueListenableBuilder<bool>(
-                        valueListenable: checkBox,
-                        builder: (context, isEnabled, child) {
-                          return SvgPicture.asset(
-                            MediaRes.checklistNote,
-                            fit: BoxFit.cover,
-                            // ignore: deprecated_member_use
-                            color: isEnabled ? AppColors.primary : Colors.grey,
-                            width: 25,
-                            height: 25,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              )
+                ),
+              ),
             ],
-          ),
+          )
         ],
       ),
     );

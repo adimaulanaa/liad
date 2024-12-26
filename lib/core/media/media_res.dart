@@ -22,6 +22,7 @@ class MediaRes {
   static const pencils = '$_baseIcon/pencil.svg';
   static const path = '$_baseIcon/path.svg';
   static const alarm = '$_baseIcon/alarm.svg';
+  static const delete = '$_baseIcon/delete.svg';
 
   //! Notes
   static const listNote = '$_baseIcon/notebook.svg';

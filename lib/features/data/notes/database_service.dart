@@ -54,7 +54,14 @@ class NotesDatabaseService {
   Future<List<NotesModel>> getAllNote() async {
     final db = await _notesDBService.database;
     List<NotesModel> res = [];
-    List<Map<String, Object?>> result = await db.query('notes');
+    // Calculate the date range for the last 7 days
+    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+    // Query the database with a date filter
+    List<Map<String, Object?>> result = await db.query(
+      'notes',
+      where: 'created_on >= ?',
+      whereArgs: [sevenDaysAgo.toString()],
+    );
     for (var e in result) {
       bool checklist = e['is_checklist'] == 1;
       res.add(
