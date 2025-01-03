@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +13,7 @@ import 'package:liad/features/data/notes/notes_provider.dart';
 import 'package:liad/features/model/notes_model.dart';
 import 'package:liad/features/model/send_notif_model.dart';
 import 'package:liad/features/presentation/notes/notes_screen.dart';
+import 'package:liad/features/widgets/images_preview.dart';
 import 'package:provider/provider.dart';
 
 class ViewNotes extends StatefulWidget {
@@ -27,11 +30,13 @@ class _ViewNotesState extends State<ViewNotes> {
   FocusNode contentFocus = FocusNode();
   DateTime dates = DateTime.now();
   String finish = 'Belum Selesai';
+  String idNote = '';
   bool isFinish = false;
   final titleController = TextEditingController();
   final contentController = TextEditingController();
   ResponseNotes response = ResponseNotes();
   NotesModel notes = NotesModel();
+  List<String> images = [];
 
   @override
   void initState() {
@@ -61,7 +66,7 @@ class _ViewNotesState extends State<ViewNotes> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) =>  const NotesScreen(),
+                builder: (context) => const NotesScreen(),
               ),
             );
           },
@@ -76,7 +81,6 @@ class _ViewNotesState extends State<ViewNotes> {
           ),
         ),
       ),
-      
       body: isLoading.value
           ? const UIDialogLoading(text: StringResources.loading)
           : _bodyData(context, size),
@@ -214,6 +218,8 @@ class _ViewNotesState extends State<ViewNotes> {
                 ),
               ),
             ),
+            imagePreview(size),
+            SizedBox(height: size.height * 0.1),
           ],
         ),
       ),
@@ -223,6 +229,7 @@ class _ViewNotesState extends State<ViewNotes> {
   void _save() async {
     final provider = Provider.of<NotesProvider>(context, listen: false);
     NotesModel push = NotesModel(
+      id: idNote,
       title: titleController.text,
       content: contentController.text,
       isChecklist: 0,
@@ -236,7 +243,13 @@ class _ViewNotesState extends State<ViewNotes> {
       context.showSuccesSnackBar(
         response.message,
         onNavigate: () {
-          Navigator.pop(context);
+          Navigator.pushReplacement(
+            // ignore: use_build_context_synchronously
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NotesScreen(),
+            ),
+          );
         }, // bottom close
       );
     } else {
@@ -261,8 +274,10 @@ class _ViewNotesState extends State<ViewNotes> {
     final provider = Provider.of<NotesProvider>(context, listen: false);
     notes = await provider.getNotesId(widget.id);
     if (notes.id != '') {
+      idNote = notes.id ?? '';
       titleController.text = notes.title ?? '';
       contentController.text = notes.content ?? '';
+      images = notes.images ?? [];
       dates = notes.createdOn!;
       if (notes.checklist!) {
         finish = 'Selesai';
@@ -270,8 +285,35 @@ class _ViewNotesState extends State<ViewNotes> {
       }
       isLoading.value = false;
     }
-    setState(() {
-      
-    });
+    setState(() {});
+  }
+
+  Widget imagePreview(Size size) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: images.map((image) {
+        return Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: InkWell(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) =>
+                    ImagePreviewFullScreen(imageBase64: image),
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.memory(
+                base64Decode(image),
+                width: size.width * 0.15,
+                height: size.width * 0.15,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

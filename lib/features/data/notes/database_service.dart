@@ -47,7 +47,7 @@ class NotesDatabaseService {
   // and a table to store users.
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(
-      'CREATE TABLE notes(_id TEXT PRIMARY KEY, title TEXT, content TEXT, is_checklist INTEGER, checklist_on TEXT, created_on TEXT, updated_on TEXT)',
+      'CREATE TABLE notes(_id TEXT PRIMARY KEY, title TEXT, content TEXT, images TEXT, is_checklist INTEGER, checklist_on TEXT, created_on TEXT, updated_on TEXT)',
     );
   }
 
@@ -69,6 +69,7 @@ class NotesDatabaseService {
           id: e['_id']?.toString() ?? '',
           title: e['title']?.toString() ?? '',
           content: e['content']?.toString() ?? '',
+          images: (e['images'] as String).split(','),
           isChecklist: int.parse(e['is_checklist']?.toString() ?? '0'),
           checklist: checklist,
           checklitsOn: e['checklist_on'] != null
@@ -105,6 +106,7 @@ class NotesDatabaseService {
       id: e['_id']?.toString() ?? '',
       title: e['title']?.toString() ?? '',
       content: e['content']?.toString() ?? '',
+      images: (e['images'] as String).split(','),
       isChecklist: int.parse(e['is_checklist']?.toString() ?? '0'),
       checklist: checklist,
       checklitsOn: e['checklist_on'] != null

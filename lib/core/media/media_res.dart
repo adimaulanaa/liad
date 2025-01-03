@@ -30,6 +30,8 @@ class MediaRes {
   static const editNotes = '$_baseIcon/note-edit.svg';
   static const searchNotes = '$_baseIcon/note-search.svg';
   static const close = '$_baseIcon/close.svg';
+  static const addPlus = '$_baseIcon/add_plus.svg';
+  static const images = '$_baseIcon/images.svg';
   static const checklistNote = '$_baseIcon/checklist-notes.svg';
   
 }

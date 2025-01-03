@@ -45,7 +45,7 @@ class NotesProvider extends ChangeNotifier {
 
   Future<ResponseNotes> updateNotes(NotesModel note) async {
     try {
-      ResponseNotes create = await notesDatabase.createNotes(note);
+      ResponseNotes create = await notesDatabase.updateNotes(note);
       return create;
     } catch (e) {
       return ResponseNotes(isSucces: false, message: e.toString());
