@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,6 +32,7 @@ class _CreateNotesState extends State<CreateNotes> {
   ResponseNotes response = ResponseNotes();
   List<String> images = [];
   bool addImages = true;
+  bool isSubmit = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,34 +41,35 @@ class _CreateNotesState extends State<CreateNotes> {
         ? const UIDialogLoading(text: StringResources.loading)
         : Scaffold(
             body: _bodyData(context, size),
-            floatingActionButton: InkWell(
-              splashFactory: NoSplash.splashFactory,
-              highlightColor: Colors.transparent,
-              onTap: () {
-                if (titleController.text.isNotEmpty &&
-                    contentController.text.isNotEmpty) {
-                  isLoading.value = true;
-                  _save();
-                }
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width - 32,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    'Simpan',
-                    style: whiteTextstyle.copyWith(
-                      fontSize: 22,
-                      fontWeight: medium,
+            floatingActionButton: isSubmit
+                ? InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      if (isSubmit) {
+                        isLoading.value = true;
+                        _save();
+                      }
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 32,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Simpan',
+                          style: whiteTextstyle.copyWith(
+                            fontSize: 22,
+                            fontWeight: medium,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  )
+                : const SizedBox.shrink(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
           );
@@ -93,7 +94,7 @@ class _CreateNotesState extends State<CreateNotes> {
                   FocusScope.of(context).requestFocus(contentFocus);
                 },
                 onChanged: (value) {
-                  // markTitleAsDirty(value);
+                  checkInput();
                 },
                 textInputAction: TextInputAction.next,
                 style: blackTextstyle.copyWith(
@@ -119,7 +120,7 @@ class _CreateNotesState extends State<CreateNotes> {
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   onChanged: (value) {
-                    // markContentAsDirty(value);
+                    checkInput();
                   },
                   style: blackTextstyle.copyWith(
                     fontSize: 15,
@@ -283,6 +284,13 @@ class _CreateNotesState extends State<CreateNotes> {
         addImages = true;
       }
       setState(() {}); // Update UI
+    }
+  }
+
+  void checkInput() {
+    if (titleController.text.isNotEmpty && contentController.text.isNotEmpty) {
+      isSubmit = true;
+      setState(() {});
     }
   }
 }

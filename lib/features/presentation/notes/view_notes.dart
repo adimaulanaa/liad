@@ -32,6 +32,7 @@ class _ViewNotesState extends State<ViewNotes> {
   String finish = 'Belum Selesai';
   String idNote = '';
   bool isFinish = false;
+  bool isSubmit = false;
   final titleController = TextEditingController();
   final contentController = TextEditingController();
   ResponseNotes response = ResponseNotes();
@@ -84,34 +85,35 @@ class _ViewNotesState extends State<ViewNotes> {
               ),
             ),
             body: _bodyData(context, size),
-            floatingActionButton: InkWell(
-              splashFactory: NoSplash.splashFactory,
-              highlightColor: Colors.transparent,
-              onTap: () {
-                if (titleController.text.isNotEmpty &&
-                    contentController.text.isNotEmpty) {
-                  isLoading.value = true;
-                  _save();
-                }
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width - 32,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    'Update',
-                    style: whiteTextstyle.copyWith(
-                      fontSize: 22,
-                      fontWeight: medium,
+            floatingActionButton: isSubmit
+                ? InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      if (isSubmit) {
+                        isLoading.value = true;
+                        _save();
+                      }
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 32,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Update',
+                          style: whiteTextstyle.copyWith(
+                            fontSize: 22,
+                            fontWeight: medium,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  )
+                : const SizedBox.shrink(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
           );
