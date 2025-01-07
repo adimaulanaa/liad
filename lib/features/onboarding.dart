@@ -36,7 +36,7 @@ class _OnboardingState extends State<Onboarding> {
           MediaRes.omboarding, // Ganti dengan path gambar Anda
           width: MediaQuery.of(context).size.width * 0.22,
           height: MediaQuery.of(context).size.height * 0.1,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
         ),
       ),
     );

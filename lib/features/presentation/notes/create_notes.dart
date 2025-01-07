@@ -8,7 +8,7 @@ import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
-import 'package:liad/core/utils/loading.dart';
+import 'package:liad/core/utils/loading_page.dart';
 import 'package:liad/core/utils/snackbar_extension.dart';
 import 'package:liad/features/data/notes/notes_provider.dart';
 import 'package:liad/features/model/notes_model.dart';
@@ -37,40 +37,41 @@ class _CreateNotesState extends State<CreateNotes> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: isLoading.value
-          ? const UIDialogLoading(text: StringResources.loading)
-          : _bodyData(context, size),
-      floatingActionButton: InkWell(
-        splashFactory: NoSplash.splashFactory,
-        highlightColor: Colors.transparent,
-        onTap: () {
-          if (titleController.text.isNotEmpty &&
-              contentController.text.isNotEmpty) {
-            isLoading.value = true;
-            _save();
-          }
-        },
-        child: Container(
-          width: MediaQuery.of(context).size.width - 32,
-          height: 50,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(
-              'Simpan',
-              style: whiteTextstyle.copyWith(
-                fontSize: 22,
-                fontWeight: medium,
+    return isLoading.value
+        ? const UIDialogLoading(text: StringResources.loading)
+        : Scaffold(
+            body: _bodyData(context, size),
+            floatingActionButton: InkWell(
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                if (titleController.text.isNotEmpty &&
+                    contentController.text.isNotEmpty) {
+                  isLoading.value = true;
+                  _save();
+                }
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width - 32,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    'Simpan',
+                    style: whiteTextstyle.copyWith(
+                      fontSize: 22,
+                      fontWeight: medium,
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+          );
   }
 
   SafeArea _bodyData(BuildContext context, Size size) {

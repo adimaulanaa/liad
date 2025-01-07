@@ -25,6 +25,7 @@ class MediaRes {
   static const delete = '$_baseIcon/delete.svg';
 
   //! Notes
+  static const calenderDays = '$_baseIcon/calendar-days.svg';
   static const listNote = '$_baseIcon/notebook.svg';
   static const notes = '$_baseIcon/note.svg';
   static const editNotes = '$_baseIcon/note-edit.svg';

@@ -5,13 +5,14 @@ import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
-import 'package:liad/core/utils/loading.dart';
+import 'package:liad/core/utils/loading_page.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/weather_model.dart';
 import 'package:liad/features/presentation/dashboard_screen.dart';
+import 'package:liad/features/presentation/report_prays.dart';
 import 'package:liad/features/widgets/profile_widget.dart';
 import 'package:liad/features/widgets/widget_dash.dart';
 import 'package:provider/provider.dart';
@@ -60,7 +61,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
+    return isLoading.value
+          ? const UIDialogLoading(text: StringResources.loading)
+          : Scaffold(
       backgroundColor: AppColors.bgScreen,
       appBar: AppBar(
         backgroundColor: AppColors.bgScreen,
@@ -97,9 +100,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           InkWell(
             splashFactory: NoSplash.splashFactory,
             highlightColor: Colors.transparent,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ReportPrays(),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: SvgPicture.asset(
+                MediaRes.calenderDays,
+                fit: BoxFit.contain,
+                width: 25,
+                // ignore: deprecated_member_use
+                color: AppColors.bgBlack,
+              ),
+            ),
+          ),
+          InkWell(
+            splashFactory: NoSplash.splashFactory,
+            highlightColor: Colors.transparent,
             onTap: () async {
               selectedDates = await selectDate(context, selectedDate);
-              setDataAlarm(selectedDates, size);
+              if (selectedDates != '') {
+                setDataAlarm(selectedDates, size);
+              }
             },
             child: Padding(
               padding: const EdgeInsets.only(right: 10),
@@ -135,9 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           )
         ],
       ),
-      body: isLoading.value
-          ? const UIDialogLoading(text: StringResources.loading)
-          : bodyData(size, context),
+      body: bodyData(size, context),
     );
   }
 
@@ -417,11 +442,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await initAlarmProfile(schadulePray, selectedDates);
       // ignore: use_build_context_synchronously
       showSnackbar(context, 'Berhasil Menambahkan alarm', true);
-      isLoading.value = false;
     } else {
       // ignore: use_build_context_synchronously
       showSnackbar(context, 'Gagal Update', false);
     }
+    isLoading.value = false;
     setState(() {});
   }
 }

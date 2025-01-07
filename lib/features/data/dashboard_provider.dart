@@ -4,6 +4,7 @@ import 'package:liad/core/utils/location_service.dart';
 import 'package:liad/features/data/dashboard_service.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
+import 'package:liad/features/model/report_prays_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/send_notif_model.dart';
 import 'package:liad/features/model/weather_model.dart';
@@ -40,6 +41,16 @@ class DashboardProvider extends ChangeNotifier {
       return data;
     } catch (e) {
       return PraysModel(isEmpty: true);
+    }
+  }
+
+  Future<List<ReportPraysModel>> loadListPrays() async {
+    try {
+      List<ReportPraysModel> data = await dataService.getListPrays();
+      notifyListeners();
+      return data;
+    } catch (e) {
+      return [];
     }
   }
 

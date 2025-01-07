@@ -8,7 +8,7 @@ import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
-import 'package:liad/core/utils/loading.dart';
+import 'package:liad/core/utils/loading_page.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
@@ -112,67 +112,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: AppColors.bgScreen,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgScreen,
-        leading: null,
-        title: Text(
-          'Hi, $myName',
-          style: blackTextstyle.copyWith(
-            fontSize: 20,
-            fontWeight: bold,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: InkWell(
-              splashFactory: NoSplash.splashFactory,
-              highlightColor: Colors.transparent,
-              onTap: () {
+    return isLoading
+        ? const UIDialogLoading(text: StringResources.loading)
+        : Scaffold(
+            backgroundColor: AppColors.bgScreen,
+            appBar: AppBar(
+              backgroundColor: AppColors.bgScreen,
+              leading: null,
+              title: Text(
+                'Hi, $myName',
+                style: blackTextstyle.copyWith(
+                  fontSize: 20,
+                  fontWeight: bold,
+                ),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      MediaRes.settings,
+                      fit: BoxFit.contain,
+                      width: 35,
+                      // ignore: deprecated_member_use
+                      color: AppColors.bgBlack,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            body: bodyData(context, size),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
+                    builder: (context) => const NotesScreen(),
                   ),
                 );
               },
+              backgroundColor: AppColors.primary,
+              shape: const CircleBorder(),
               child: SvgPicture.asset(
-                MediaRes.settings,
+                MediaRes.listNote,
                 fit: BoxFit.contain,
-                width: 35,
+                width: 30,
                 // ignore: deprecated_member_use
-                color: AppColors.bgBlack,
+                color: AppColors.bgColor,
               ),
             ),
-          ),
-        ],
-      ),
-      body: isLoading
-          ? const UIDialogLoading(text: StringResources.loading)
-          : bodyData(context, size),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const NotesScreen(),
-            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           );
-        },
-        backgroundColor: AppColors.primary,
-        shape: const CircleBorder(),
-        child: SvgPicture.asset(
-          MediaRes.listNote,
-          fit: BoxFit.contain,
-          width: 30,
-          // ignore: deprecated_member_use
-          color: AppColors.bgColor,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
   }
 
   SafeArea bodyData(BuildContext context, Size size) {

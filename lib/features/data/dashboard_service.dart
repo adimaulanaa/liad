@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
+import 'package:liad/features/model/report_prays_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/weather_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,6 +87,46 @@ class DashboardService {
       print('Gagal : $e');
     }
     return model;
+  }
+
+  Future<List<ReportPraysModel>> getListPrays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    List<ReportPraysModel> model = [];
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Prays");
+
+    try {
+      String? deviceId = prefs.getString('devicesId');
+
+      // Hitung awal dan akhir bulan saat ini
+      DateTime startOfMonth = DateTime(now.year, now.month, 1);
+      DateTime endOfMonth = DateTime(now.year, now.month + 1, 1)
+          .subtract(const Duration(seconds: 1));
+
+      QuerySnapshot praysSnapshot = await myStore
+          .where('devices_id', isEqualTo: deviceId)
+          .where('timestamp', isGreaterThanOrEqualTo: startOfMonth)
+          .where('timestamp', isLessThanOrEqualTo: endOfMonth)
+          .get();
+
+      if (praysSnapshot.docs.isNotEmpty) {
+        for (var doc in praysSnapshot.docs) {
+          // Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          PraysModel dt =
+              PraysModel.fromJson(doc.data() as Map<String, dynamic>);
+          List<ReportPraysModel> sum = setData(dt);
+          if (sum.isNotEmpty) {
+            model.addAll(sum);
+          }
+        }
+      }
+      return model;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+      return model;
+    }
   }
 
   Future<Cuaca> getWeather(String id) async {
@@ -428,5 +469,55 @@ class DashboardService {
       // ignore: avoid_print
       print('Gagal memperbarui data: $e');
     }
+  }
+
+  List<ReportPraysModel> setData(PraysModel data) {
+    List<ReportPraysModel> model = [];
+    if (data.isFajr == true) {
+      model.add(ReportPraysModel(
+        'Fajr',
+        (data.timestamp as Timestamp).toDate(),
+        data.onFajr,
+        data.finishFajr,
+        data.isFajr,
+      ));
+    }
+    if (data.isDhuhr == true) {
+      model.add(ReportPraysModel(
+        'Dhuhr',
+        (data.timestamp as Timestamp).toDate(),
+        data.onDhuhr,
+        data.finishDhuhr,
+        data.isDhuhr,
+      ));
+    }
+    if (data.isAsr == true) {
+      model.add(ReportPraysModel(
+        'Asr',
+        (data.timestamp as Timestamp).toDate(),
+        data.onAsr,
+        data.finishAsr,
+        data.isAsr,
+      ));
+    }
+    if (data.isMaghrib == true) {
+      model.add(ReportPraysModel(
+        'Maghrib',
+        (data.timestamp as Timestamp).toDate(),
+        data.onMaghrib,
+        data.finishMaghrib,
+        data.isMaghrib,
+      ));
+    }
+    if (data.isIsya == true) {
+      model.add(ReportPraysModel(
+        'Isya',
+        (data.timestamp as Timestamp).toDate(),
+        data.onIsya,
+        data.finishIsya,
+        data.isIsya,
+      ));
+    }
+    return model;
   }
 }
