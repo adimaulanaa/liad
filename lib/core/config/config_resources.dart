@@ -8,6 +8,10 @@ class StringResources {
   static const String profile = "Profile"; 
   static const String welcome = "Welcome Anonim"; 
   static const String loading = "Loading..."; 
+  // update app
+  static const String titleUpdateApp = "New update is available"; 
+  static const String subTitleUpdateApp = "Dapatkan fitur terbaru dan peningkatan performa dengan memperbarui aplikasi Anda sekarang!"; 
+  static const String linkUpdateApp = "https://drive.google.com/drive/folders/1O5nDZ0YgvCTcXxr3HlR3eSTCeisb9Icd?usp=sharing"; 
 
 
   //! Notif popup Alarm

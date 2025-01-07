@@ -43,7 +43,13 @@ class _ReportPraysState extends State<ReportPrays> {
         : Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: const Text('Report Your Prays'),
+              title: Text(
+                'Report Your Prays',
+                style: blackTextstyle.copyWith(
+                  fontSize: 15,
+                  fontWeight: medium,
+                ),
+              ),
             ),
             body: SingleChildScrollView(
               child: Column(

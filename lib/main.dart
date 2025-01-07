@@ -2,6 +2,7 @@ import 'package:alarm/alarm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:liad/core/config/config_resources.dart';
+import 'package:liad/core/config/remote_config_service.dart';
 import 'package:liad/core/firebase/firebase_api.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/data/dashboard_service.dart';
@@ -25,6 +26,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await RemoteConfigService().initConfig();
   await FirebaseApi().initNotifications();
   await FirebaseApi().initProfile();
   await FirebaseApi().initPrays();

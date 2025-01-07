@@ -8,10 +8,10 @@ class UIDialogLoading extends StatefulWidget {
   final String text;
 
   @override
-  _UIDialogLoadingState createState() => _UIDialogLoadingState();
+  UIDialogLoadingState createState() => UIDialogLoadingState();
 }
 
-class _UIDialogLoadingState extends State<UIDialogLoading>
+class UIDialogLoadingState extends State<UIDialogLoading>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;

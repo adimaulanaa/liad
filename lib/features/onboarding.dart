@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:liad/core/config/remote_config_service.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_colors.dart';
+import 'package:liad/core/utils/version.dart';
 import 'package:liad/features/presentation/dashboard_screen.dart';
+import 'package:liad/features/update_apps.dart';
 
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
@@ -15,16 +18,34 @@ class _OnboardingState extends State<Onboarding> {
   @override
   void initState() {
     super.initState();
+    _initializeApp();
+  }
+
+  /// Initializes the app by checking the version and navigating to the appropriate screen.
+  Future<void> _initializeApp() async {
+    // Fetch remote and local app versions
+    final String remoteVersion = RemoteConfigService().version;
+    final String appVersion = await getVersion();
+
+    // Check if an update is needed
+    final bool isUpdateRequired = appVersion != remoteVersion;
+
+    // Set immersive mode for the app
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    Future.delayed(const Duration(seconds: 4), () {
-     Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(
-            builder: (context) => const DashboardScreen(), 
-          ),
-        );
-    });
+
+    // Navigate to the appropriate screen after a delay
+    await Future.delayed(const Duration(seconds: 4));
+
+    final Widget targetScreen =
+        isUpdateRequired ? const UpdateApps() : const DashboardScreen();
+
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
+        context,
+        MaterialPageRoute(builder: (context) => targetScreen),
+      );
+    }
   }
 
   @override
