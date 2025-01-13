@@ -7,6 +7,7 @@ import 'package:liad/core/media/media_text.dart';
 class ListScheduleWidget extends StatelessWidget {
   final String type;
   final String time;
+  final bool isMens;
   final ValueNotifier<bool> checkBox;
   final ValueNotifier<bool> alarm;
   final VoidCallback onTapCheckBox;
@@ -16,6 +17,7 @@ class ListScheduleWidget extends StatelessWidget {
     super.key,
     required this.type,
     required this.time,
+    required this.isMens,
     required this.checkBox,
     required this.alarm,
     required this.onTapCheckBox,
@@ -72,9 +74,11 @@ class ListScheduleWidget extends StatelessWidget {
                 splashFactory: NoSplash.splashFactory,
                 highlightColor: Colors.transparent,
                 onTap: () {
-                  checkBox.value =
-                      !checkBox.value; // Toggle status ValueNotifier
-                  onTapCheckBox(); // Callback tambahan
+                  if (!isMens) {
+                    checkBox.value =
+                        !checkBox.value; // Toggle status ValueNotifier
+                    onTapCheckBox(); // Callback tambahan
+                  }
                 },
                 child: ValueListenableBuilder<bool>(
                   valueListenable: checkBox,

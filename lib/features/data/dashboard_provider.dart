@@ -217,4 +217,19 @@ class DashboardProvider extends ChangeNotifier {
       return UpdateNameModel(isError: true, error: e.toString());
     }
   }
+
+  Future<UpdateNameModel> updatePeriode(bool value) async {
+    try {
+      bool isSuc = false;
+      await prefs.setBool('periodeMens', value);
+      String get = await dataService.updatePeriode(value);
+      if (get == '') {
+        isSuc = true;
+      }
+      notifyListeners();
+      return UpdateNameModel(isError: isSuc, error: get);
+    } catch (e) {
+      return UpdateNameModel(isError: true, error: e.toString());
+    }
+  }
 }

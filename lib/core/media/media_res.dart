@@ -19,6 +19,7 @@ class MediaRes {
    static const sendNotif = '$_baseIcon/send-notif.svg';
   static const compass = '$_baseIcon/compass.svg';
   static const settings = '$_baseIcon/settings.svg';
+  static const periodeMens = '$_baseIcon/periode-mens.svg';
   static const pencils = '$_baseIcon/pencil.svg';
   static const path = '$_baseIcon/path.svg';
   static const alarm = '$_baseIcon/alarm.svg';

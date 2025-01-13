@@ -39,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isData = false;
   bool isDtWWork = false;
   bool isDtWHome = false;
+  bool isPeriodeMens = false;
+  bool isPaysData = false;
   DateTime? selectedDate;
 
   UpdateNameModel updateName = UpdateNameModel();
@@ -62,108 +64,108 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return isLoading.value
-          ? const UIDialogLoading(text: StringResources.loading)
-          : Scaffold(
-      backgroundColor: AppColors.bgScreen,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgScreen,
-        centerTitle: true,
-        title: Text(
-          'Profile',
-          style: blackTextstyle.copyWith(
-            fontSize: 20,
-            fontWeight: bold,
-          ),
-        ),
-        leading: InkWell(
-          splashFactory: NoSplash.splashFactory,
-          highlightColor: Colors.transparent,
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const DashboardScreen(),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(13.0),
-            child: SvgPicture.asset(
-              MediaRes.back,
-              // ignore: deprecated_member_use
-              color: AppColors.bgBlack,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        actions: [
-          InkWell(
-            splashFactory: NoSplash.splashFactory,
-            highlightColor: Colors.transparent,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ReportPrays(),
+        ? const UIDialogLoading(text: StringResources.loading)
+        : Scaffold(
+            backgroundColor: AppColors.bgScreen,
+            appBar: AppBar(
+              backgroundColor: AppColors.bgScreen,
+              centerTitle: true,
+              title: Text(
+                'Profile',
+                style: blackTextstyle.copyWith(
+                  fontSize: 20,
+                  fontWeight: bold,
                 ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: SvgPicture.asset(
-                MediaRes.calenderDays,
-                fit: BoxFit.contain,
-                width: 25,
-                // ignore: deprecated_member_use
-                color: AppColors.bgBlack,
               ),
-            ),
-          ),
-          InkWell(
-            splashFactory: NoSplash.splashFactory,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              selectedDates = await selectDate(context, selectedDate);
-              if (selectedDates != '') {
-                setDataAlarm(selectedDates, size);
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: SvgPicture.asset(
-                MediaRes.alarm,
-                fit: BoxFit.contain,
-                width: 25,
-                // ignore: deprecated_member_use
-                color: AppColors.bgBlack,
+              leading: InkWell(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DashboardScreen(),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(13.0),
+                  child: SvgPicture.asset(
+                    MediaRes.back,
+                    // ignore: deprecated_member_use
+                    color: AppColors.bgBlack,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
+              actions: [
+                InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ReportPrays(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: SvgPicture.asset(
+                      MediaRes.calenderDays,
+                      fit: BoxFit.contain,
+                      width: 25,
+                      // ignore: deprecated_member_use
+                      color: AppColors.bgBlack,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
+                  onTap: () async {
+                    selectedDates = await selectDate(context, selectedDate);
+                    if (selectedDates != '') {
+                      setDataAlarm(selectedDates, size);
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: SvgPicture.asset(
+                      MediaRes.alarm,
+                      fit: BoxFit.contain,
+                      width: 25,
+                      // ignore: deprecated_member_use
+                      color: AppColors.bgBlack,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(
+                      text: profile.id.toString(),
+                    ));
+                    // ignore: use_build_context_synchronously
+                    showSnackbars(context, 'Berhasil salin ID kamu.', 3);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: SvgPicture.asset(
+                      MediaRes.path,
+                      fit: BoxFit.contain,
+                      width: 25,
+                      // ignore: deprecated_member_use
+                      color: AppColors.bgBlack,
+                    ),
+                  ),
+                )
+              ],
             ),
-          ),
-          InkWell(
-            splashFactory: NoSplash.splashFactory,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              await Clipboard.setData(ClipboardData(
-                text: profile.id.toString(),
-              ));
-              // ignore: use_build_context_synchronously
-              showSnackbars(context, 'Berhasil salin ID kamu.', 3);
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: SvgPicture.asset(
-                MediaRes.path,
-                fit: BoxFit.contain,
-                width: 25,
-                // ignore: deprecated_member_use
-                color: AppColors.bgBlack,
-              ),
-            ),
-          )
-        ],
-      ),
-      body: bodyData(size, context),
-    );
+            body: bodyData(size, context),
+          );
   }
 
   SafeArea bodyData(Size size, BuildContext context) {
@@ -269,22 +271,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       SizedBox(height: size.height * 0.01),
-                      prays.isFajr!
-                          ? _prays(size)
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: Text(
-                                'Tidak ada data Pray',
-                                style: greyTextstyle.copyWith(
-                                  fontSize: 12,
-                                  fontWeight: bold,
-                                ),
-                              ),
-                            ),
+                      !isPeriodeMens
+                          ? isPaysData
+                              ? _prays(size)
+                              : noData('Tidak ada data Sholat')
+                          : noData('Anda sedang libur sholat'),
                     ],
                   )
-                : const SizedBox.shrink(),
+                : noData('Tidak ada data'),
           ],
+        ),
+      ),
+    );
+  }
+
+  Padding noData(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Text(
+        title,
+        style: greyTextstyle.copyWith(
+          fontSize: 12,
+          fontWeight: bold,
         ),
       ),
     );
@@ -374,6 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     prays = await provider.loadPrays();
     String work = await getTypeWeather(1);
     String home = await getTypeWeather(2);
+    isPeriodeMens = await getPeriodeMens();
     if (prays.id != '') {
       isData = true;
     }
@@ -384,6 +393,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (home.isNotEmpty) {
       isDtWHome = true;
       homeWeater = await provider.loadWeater(2);
+    }
+    if (prays.isFajr! || prays.isDhuhr! || prays.isAsr! || prays.isMaghrib! || prays.isIsya!) {
+      isPaysData = true;
     }
     setState(() {});
   }

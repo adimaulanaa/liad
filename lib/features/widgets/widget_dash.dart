@@ -105,6 +105,12 @@ Future<String> getName() async {
   return myName;
 }
 
+Future<bool> getPeriodeMens() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool data = prefs.getBool('periodeMens') ?? false;
+  return data;
+}
+
 Future<String> getTypeWeather(int type) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String data = '';

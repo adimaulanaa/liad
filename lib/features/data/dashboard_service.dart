@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:liad/core/utils/device_info_plus.dart';
 import 'package:liad/features/model/prays_model.dart';
 import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/report_prays_model.dart';
@@ -469,6 +470,54 @@ class DashboardService {
       // ignore: avoid_print
       print('Gagal memperbarui data: $e');
     }
+  }
+
+  Future<String> updatePeriode(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Prays");
+    // Mengambil deviceId dari SharedPreferences
+    String? deviceId = prefs.getString('devicesId');
+    // Jika deviceId belum ada, ambil dan simpan ke SharedPreferences
+    if (deviceId == null) {
+      deviceId = await getDeviceId();
+      await prefs.setString('devicesId', deviceId);
+    }
+    try {
+      QuerySnapshot docSnapshot =
+          await myStore.where('devices_id', isEqualTo: deviceId).get();
+      if (docSnapshot.docs.isNotEmpty) {
+        DocumentSnapshot existingDoc = docSnapshot.docs.first;
+        await existingDoc.reference.update({
+          'devices_id': '-',
+          'finish_asr': '-',
+          'finish_dhuhr': '-',
+          'finish_fajr': '-',
+          'finish_isya': '-',
+          'finish_maghrib': '-',
+          'is_asr': false,
+          'is_dhuhr': false,
+          'is_fajr': false,
+          'is_isya': false,
+          'is_maghrib': false,
+          'on_asr': '-',
+          'on_dhuhr': '-',
+          'on_fajr': '-',
+          'on_isya': '-',
+          'on_maghrib': '-',
+          'periode': value,
+          'timstamp': now.toString(),
+        });
+        return 'Berhasil Updated';
+      } else {
+        return 'Gagal Updated';
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+    }
+    return '';
   }
 
   List<ReportPraysModel> setData(PraysModel data) {

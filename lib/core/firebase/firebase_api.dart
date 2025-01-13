@@ -136,6 +136,7 @@ class FirebaseApi {
 
   Future<void> initPrays() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool mens = prefs.getBool('periodeMens') ?? false;
     final CollectionReference myPrays =
         FirebaseFirestore.instance.collection("Prays");
     // Mengambil deviceId dari SharedPreferences
@@ -175,6 +176,7 @@ class FirebaseApi {
           'on_fajr': '',
           'on_isya': '',
           'on_maghrib': '',
+          'periode': mens,
         });
       }
     } catch (e) {

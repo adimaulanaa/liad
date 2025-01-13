@@ -9,8 +9,10 @@ import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
 import 'package:liad/core/utils/loading_page.dart';
+import 'package:liad/core/utils/snackbar_extension.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
+import 'package:liad/features/model/profile_model.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/presentation/list_schedule_widget.dart';
 import 'package:liad/features/presentation/notes/notes_screen.dart';
@@ -31,6 +33,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isLoading = true;
   bool isData = false;
+  bool isPeriodeMens = false;
   bool isSholatFinish = false;
   late Timer _timer;
   late DateTime _currentTime;
@@ -89,6 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     prays = await provider.loadPrays();
     location = await provider.loadLocation();
     myName = await getName();
+    isPeriodeMens = await getPeriodeMens();
     if (!model.isError) {
       isLoading = false;
       if (model.scheduleTime != '') {
@@ -127,6 +131,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      isLoading = false;
+                      updatePeriode();
+                    },
+                    child: SvgPicture.asset(
+                      MediaRes.periodeMens,
+                      fit: BoxFit.contain,
+                      width: 50,
+                      // ignore: deprecated_member_use
+                      color: isPeriodeMens ? AppColors.bgRed :AppColors.bgBlack,
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
                   child: InkWell(
@@ -200,6 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 alarm: isAlarmFajr,
                 type: "Fajr",
                 time: model.fajr.toString(),
+                isMens: isPeriodeMens,
                 checkBox: isFajr,
                 onTapCheckBox: () {
                   updateFinish(1, isFajr.value, model.fajr.toString());
@@ -212,6 +235,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 alarm: isAlarmDhuhr,
                 type: "Dhuhr",
                 time: model.dhuhr.toString(),
+                isMens: isPeriodeMens,
                 checkBox: isDhuhr,
                 onTapCheckBox: () {
                   updateFinish(2, isDhuhr.value, model.dhuhr.toString());
@@ -224,6 +248,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 alarm: isAlarmAsr,
                 type: "Asr",
                 time: model.asr.toString(),
+                isMens: isPeriodeMens,
                 checkBox: isAsr,
                 onTapCheckBox: () {
                   updateFinish(3, isAsr.value, model.asr.toString());
@@ -236,6 +261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 alarm: isAlarmMaghrib,
                 type: "Maghrib",
                 time: model.maghrib.toString(),
+                isMens: isPeriodeMens,
                 checkBox: isMaghrib,
                 onTapCheckBox: () {
                   updateFinish(4, isMaghrib.value, model.maghrib.toString());
@@ -248,6 +274,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 alarm: isAlarmIsha,
                 type: "Isha",
                 time: model.isha.toString(),
+                isMens: isPeriodeMens,
                 checkBox: isIsha,
                 onTapCheckBox: () {
                   updateFinish(5, isIsha.value, model.isha.toString());
@@ -263,6 +290,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void updatePeriode() async {
+    final provider = Provider.of<DashboardProvider>(context, listen: false);
+    bool update = false;
+    if (!isPeriodeMens) {
+      update = true;
+    }
+    UpdateNameModel response = await provider.updatePeriode(update);
+    if (!response.isError) {
+      isPeriodeMens = update;
+      // ignore: use_build_context_synchronously
+      context.showSuccesSnackBar(
+        response.error,
+        onNavigate: () {}, // bottom close
+      );
+    } else {
+      // ignore: use_build_context_synchronously
+      context.showErrorSnackBar(
+        response.error,
+        onNavigate: () {}, // bottom close
+      );
+    }
+    isLoading = false;
+     setState(() {});
+  }
+
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
@@ -275,8 +327,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void updateFinish(int type, bool value, String pray) async {
-    final provider = Provider.of<DashboardProvider>(context, listen: false);
-    await provider.updateScheduleSholat(type, value, prays.id ?? '', pray);
+    if (!isPeriodeMens) {
+      final provider = Provider.of<DashboardProvider>(context, listen: false);
+      await provider.updateScheduleSholat(type, value, prays.id ?? '', pray);
+    }
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
