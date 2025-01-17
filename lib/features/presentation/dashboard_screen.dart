@@ -120,59 +120,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ? const UIDialogLoading(text: StringResources.loading)
         : Scaffold(
             backgroundColor: AppColors.bgScreen,
-            appBar: AppBar(
-              backgroundColor: AppColors.bgScreen,
-              leading: null,
-              title: Text(
-                'Hi, $myName',
-                style: blackTextstyle.copyWith(
-                  fontSize: 20,
-                  fontWeight: bold,
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: InkWell(
-                    splashFactory: NoSplash.splashFactory,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      isLoading = false;
-                      updatePeriode();
-                    },
-                    child: SvgPicture.asset(
-                      MediaRes.periodeMens,
-                      fit: BoxFit.contain,
-                      width: 50,
-                      // ignore: deprecated_member_use
-                      color: isPeriodeMens ? AppColors.bgRed :AppColors.bgBlack,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: InkWell(
-                    splashFactory: NoSplash.splashFactory,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
-                        ),
-                      );
-                    },
-                    child: SvgPicture.asset(
-                      MediaRes.settings,
-                      fit: BoxFit.contain,
-                      width: 35,
-                      // ignore: deprecated_member_use
-                      color: AppColors.bgBlack,
-                    ),
-                  ),
-                ),
-              ],
-            ),
             body: bodyData(context, size),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
@@ -205,7 +152,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.only(left: 20, right: 20),
           child: Column(
             children: [
-              // _contentSholat(),
+              SizedBox(height: size.height * 0.01),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Hi, $myName',
+                    style: blackTextstyle.copyWith(
+                      fontSize: 20,
+                      fontWeight: bold,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 5),
+                        child: InkWell(
+                          splashFactory: NoSplash.splashFactory,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            isLoading = false;
+                            updatePeriode();
+                          },
+                          child: SvgPicture.asset(
+                            MediaRes.periodeMens,
+                            fit: BoxFit.contain,
+                            width: 50,
+                            // ignore: deprecated_member_use
+                            color: isPeriodeMens
+                                ? AppColors.bgRed
+                                : AppColors.bgBlack,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        splashFactory: NoSplash.splashFactory,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: SvgPicture.asset(
+                          MediaRes.settings,
+                          fit: BoxFit.contain,
+                          width: 35,
+                          // ignore: deprecated_member_use
+                          color: AppColors.bgBlack,
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              SizedBox(height: size.height * 0.02),
               SholatContentWidget(
                 day: day,
                 location: location,
@@ -312,7 +315,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
     isLoading = false;
-     setState(() {});
+    setState(() {});
   }
 
   void _startTimer() {

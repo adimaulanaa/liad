@@ -369,11 +369,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   String connect(String name) {
-    String name = 'Connect Love';
-    if (profile.connectName != '' && profile.connectName != null) {
-      name = ' Your Connect ${profile.connectName}';
+    String names = 'Connect Love';
+    if (name != '') {
+      names = 'Your Connect $name';
     }
-    return name;
+    return names;
   }
 
   void getData() async {
@@ -413,6 +413,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void getProfile() async {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     profile = await provider.getProfile();
+    if (profile.name != '') {
+      myName = profile.name.toString();
+    }
     setState(() {});
   }
 
@@ -422,6 +425,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await provider.updateConnect(profile.id!, loveController.text);
     if (!updateConnect.isError) {
       loveController.text = '';
+      // ignore: use_build_context_synchronously
+      showSnackbar(context, 'Connect Sukses', true);
     } else {
       // ignore: use_build_context_synchronously
       showSnackbar(context, 'Gagal Connect', false);
