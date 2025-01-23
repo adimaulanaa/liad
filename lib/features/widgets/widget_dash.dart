@@ -108,7 +108,7 @@ Future<String> getName() async {
 
 Future<String> getImages() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String myName = prefs.getString('images') ?? StringResources.myName;
+  String myName = prefs.getString('images') ?? '';
   String images = clearUrlImageDriveGoogle(myName);
   return images;
 }

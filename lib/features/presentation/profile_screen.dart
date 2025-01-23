@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: AppColors.primary,
                   ),
                   child: Text(
-                    connect(profile.connectName.toString()),
+                    connect(profile.connectName ?? ''),
                     style: whiteTextstyle.copyWith(
                       fontSize: 15,
                       fontWeight: bold,
@@ -456,7 +456,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> updateImages() async {
     setImages(imageController.text);
     myImages = await getImages();
-    if (myImages.isNotEmpty) {
+    if (myImages != '') {
       isImages = true;
       imageController.clear();
     }
@@ -466,7 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void getDataImages() async {
     myImages = await getImages();
-    if (myImages.isNotEmpty) {
+    if (myImages != '') {
       isImages = true;
       imageController.clear();
     }

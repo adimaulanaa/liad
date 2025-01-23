@@ -363,10 +363,25 @@ class DashboardService {
         FirebaseFirestore.instance.collection("Profile");
     try {
       DateTime now = DateTime.now();
+      // Update berdasarkan connect_id yang sama dengan id
+      QuerySnapshot connectMember = await myStore
+          .where('connect_id', isEqualTo: id) // Filter dengan 'connect_id'
+          .get();
+
       await myStore.doc(id).update({
         'name': name,
         'timstamp': now.toString(),
       });
+
+      if (connectMember.docs.isNotEmpty) {
+        // Update setiap dokumen yang ditemukan
+        for (var doc in connectMember.docs) {
+          await myStore.doc(doc.id).update({
+            'connect_name': name,
+            'timestamp': now.toString(),
+          });
+        }
+      }
       return 'Success';
     } catch (e) {
       // ignore: avoid_print
