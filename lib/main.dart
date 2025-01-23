@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/config/remote_config_service.dart';
 import 'package:liad/core/firebase/firebase_api.dart';
+import 'package:liad/core/utils/request_sound_mode.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/data/dashboard_service.dart';
 import 'package:liad/features/data/notes/database_service.dart';
@@ -32,6 +33,8 @@ void main() async {
   await FirebaseApi().initPrays();
   await FirebaseApi().initScheduleSholat();
   final prefs = await SharedPreferences.getInstance();
+  // Inisialisasi lainnya
+  await requestDoNotDisturbPermission();
   // Inisialisasi NotesDatabaseService
   final notesDatabase = NotesDatabaseService();
   // runApp(const MyApp());

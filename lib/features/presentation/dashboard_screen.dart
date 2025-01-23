@@ -9,6 +9,7 @@ import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_res.dart';
 import 'package:liad/core/media/media_text.dart';
 import 'package:liad/core/utils/loading_page.dart';
+import 'package:liad/core/utils/set_alarm_time.dart';
 import 'package:liad/core/utils/snackbar_extension.dart';
 import 'package:liad/features/data/dashboard_provider.dart';
 import 'package:liad/features/model/prays_model.dart';
@@ -75,8 +76,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     //schedule alarm permission
     checkAndroidScheduleExactAlarmPermission();
     loadAlarms();
-    subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
-    //listen alarm if active than navigate to alarm screen
+    subscription ??= Alarm.ringStream.stream.listen((alarmSettings) {
+      // Alarm.stop(1);
+      // handleActiveAlarmSound(alarmSettings); // Cek status mode suara perangkat saat alarm aktif
+    });
   }
 
   @override
@@ -89,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String date = DateFormat('dd-MM-yyyy').format(now);
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     model = await provider.loadPrayerSchedule(date);
-    prays = await provider.loadPrays();
+    prays = await provider.loadPrays('');
     location = await provider.loadLocation();
     myName = await getName();
     isPeriodeMens = await getPeriodeMens();
@@ -358,24 +361,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } catch (e) {
       debugPrint('Error loading alarms: $e'); // Tangani error jika ada
     }
-  }
-
-  void setAlarm(int id, DateTime date, String title, body) async {
-    final alarmSettings = AlarmSettings(
-      id: id,
-      dateTime: date,
-      assetAudioPath: 'assets/ringtone/alarm-tone.mp3',
-      loopAudio: true,
-      vibrate: true,
-      volume: 0.8,
-      fadeDuration: 3.0,
-      notificationSettings: NotificationSettings(
-        body: body,
-        title: title,
-      ),
-    );
-
-    await Alarm.set(alarmSettings: alarmSettings);
   }
 
   void initAlarm() async {

@@ -14,6 +14,7 @@ class ProfileModel {
   String? devicesId;
   String? connectName;
   String? connectId;
+  String? connectDevices;
   String? latitude;
   String? longitude;
   String? name;
@@ -25,6 +26,7 @@ class ProfileModel {
     this.devicesId,
     this.connectName,
     this.connectId,
+    this.connectDevices = '',
     this.latitude,
     this.longitude,
     this.name,

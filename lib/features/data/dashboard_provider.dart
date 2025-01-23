@@ -34,9 +34,9 @@ class DashboardProvider extends ChangeNotifier {
     }
   }
 
-  Future<PraysModel> loadPrays() async {
+  Future<PraysModel> loadPrays(String devices) async {
     try {
-      PraysModel data = await dataService.getPrays();
+      PraysModel data = await dataService.getPrays(devices);
       notifyListeners();
       return data;
     } catch (e) {
@@ -162,6 +162,10 @@ class DashboardProvider extends ChangeNotifier {
   Future<ProfileModel> getProfile() async {
     try {
       ProfileModel get = await dataService.getProfile();
+      if (get.connectId != '') {
+        String connect = await dataService.getProfileId(get.connectId.toString());
+        get.connectDevices = connect;
+      }
       // Ambil data dari API atau Firebase, misalnya Firebase diutamakan
       ProfileModel data = get;
       notifyListeners();

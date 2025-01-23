@@ -379,13 +379,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void getData() async {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     myName = await getName();
-    prays = await provider.loadPrays();
     String work = await getTypeWeather(1);
     String home = await getTypeWeather(2);
     isPeriodeMens = await getPeriodeMens();
-    if (prays.id != '') {
-      isData = true;
-    }
+
     if (work.isNotEmpty) {
       isDtWWork = true;
       workWeater = await provider.loadWeater(1);
@@ -393,9 +390,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (home.isNotEmpty) {
       isDtWHome = true;
       homeWeater = await provider.loadWeater(2);
-    }
-    if (prays.isFajr! || prays.isDhuhr! || prays.isAsr! || prays.isMaghrib! || prays.isIsya!) {
-      isPaysData = true;
     }
     setState(() {});
   }
@@ -415,6 +409,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     profile = await provider.getProfile();
     if (profile.name != '') {
       myName = profile.name.toString();
+    }
+    if (profile.connectDevices != '') {
+      prays = await provider.loadPrays(profile.connectDevices.toString());
+      if (prays.id != '') {
+        isData = true;
+      }
+      if (prays.isFajr! ||
+          prays.isDhuhr! ||
+          prays.isAsr! ||
+          prays.isMaghrib! ||
+          prays.isIsya!) {
+        isPaysData = true;
+      }
     }
     setState(() {});
   }

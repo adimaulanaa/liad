@@ -39,6 +39,8 @@ dependencies:
   table_calendar: ^3.0.9
   firebase_remote_config: ^5.2.0
   package_info_plus: ^8.1.2
+  sound_mode: ^3.0.0
+  vibration: ^2.0.1
 
 dev_dependencies:
   flutter_test:

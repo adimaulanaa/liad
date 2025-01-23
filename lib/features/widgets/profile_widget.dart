@@ -1,4 +1,3 @@
-import 'package:alarm/alarm.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_colors.dart';
 import 'package:liad/core/media/media_text.dart';
+import 'package:liad/core/utils/set_alarm_time.dart';
 import 'package:liad/features/model/schedule_sholat_model.dart';
 import 'package:liad/features/model/weather_model.dart';
 import 'package:liad/features/widgets/widget_dash.dart';
@@ -665,20 +665,4 @@ Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) a
   }
 }
 
-Future<void> setAlarm(int id, DateTime date, String title, String body) async {
-  final alarmSettings = AlarmSettings(
-    id: id,
-    dateTime: date,
-    assetAudioPath: 'assets/ringtone/alarm-tone.mp3',
-    loopAudio: true,
-    vibrate: true,
-    volume: 0.8,
-    fadeDuration: 3.0,
-    notificationSettings: NotificationSettings(
-      body: body,
-      title: title,
-    ),
-  );
 
-  await Alarm.set(alarmSettings: alarmSettings);
-}

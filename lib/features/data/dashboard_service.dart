@@ -57,7 +57,7 @@ class DashboardService {
     }
   }
 
-  Future<PraysModel> getPrays() async {
+  Future<PraysModel> getPrays(String devices) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     DateTime now = DateTime.now();
     PraysModel model = PraysModel();
@@ -65,11 +65,14 @@ class DashboardService {
         FirebaseFirestore.instance.collection("Prays");
     try {
       String? deviceId = prefs.getString('devicesId');
+      if (devices == '') {
+        devices = deviceId.toString();
+      }
       DateTime startOfDay = DateTime(now.year, now.month, now.day); // Awal hari
       DateTime endOfDay =
           DateTime(now.year, now.month, now.day, 23, 59, 59); // Akhir hari
       QuerySnapshot praysSnapshot = await myStore
-          .where('devices_id', isEqualTo: deviceId)
+          .where('devices_id', isEqualTo: devices)
           .where('timestamp',
               isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
           .where('timestamp', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
@@ -333,6 +336,26 @@ class DashboardService {
       print('Gagal : $e');
     }
     return model;
+  }
+
+  Future<String> getProfileId(String id) async {
+    String devices = '';
+    final CollectionReference myStore =
+        FirebaseFirestore.instance.collection("Profile");
+    try {
+      DocumentSnapshot doc = await myStore.doc(id).get();
+      if (doc.exists) {
+        // Ambil nilai 'devices_id' dari dokumen
+        devices = doc['devices_id'] ?? ''; // Pastikan 'devices_id' ada
+        return devices;
+      } else {
+        return devices; // Kembalikan string kosong jika dokumen tidak ditemukan
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Gagal : $e');
+    }
+    return devices;
   }
 
   Future<String> updateNames(String id, name) async {
