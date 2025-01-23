@@ -109,29 +109,29 @@ class ListScheduleWidget extends StatelessWidget {
                   },
                 ),
               ),
-              Container(),
-              // InkWell(
-              //   splashFactory: NoSplash.splashFactory,
-              //   highlightColor: Colors.transparent,
-              //   onTap: () { // Toggle status ValueNotifier
-              //     onTapAlarm(); // Callback tambahan
-              //   },
-              //   child: ValueListenableBuilder<bool>(
-              //     valueListenable: alarm,
-              //     builder: (context, isEnabled, child) {
-              //       return SvgPicture.asset(
-              //         isEnabled ? MediaRes.alarmDring : MediaRes.alarmSlient,
-              //         fit: BoxFit.cover,
-              //         // ignore: deprecated_member_use
-              //         color: isEnabled
-              //             ? Colors.black
-              //             : Colors.grey, // Ganti sesuai warna
-              //         width: 20,
-              //         height: 20,
-              //       );
-              //     },
-              //   ),
-              // ),
+              // Container(),
+              InkWell(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+                onTap: () { // Toggle status ValueNotifier
+                  onTapAlarm(); // Callback tambahan
+                },
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: alarm,
+                  builder: (context, isEnabled, child) {
+                    return SvgPicture.asset(
+                      isEnabled ? MediaRes.alarmDring : MediaRes.alarmSlient,
+                      fit: BoxFit.cover,
+                      // ignore: deprecated_member_use
+                      color: isEnabled
+                          ? Colors.black
+                          : Colors.grey, // Ganti sesuai warna
+                      width: 20,
+                      height: 20,
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ],

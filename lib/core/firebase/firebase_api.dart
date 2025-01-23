@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:geolocator/geolocator.dart';
@@ -209,7 +210,8 @@ class FirebaseApi {
       if (now.year == today.year &&
           now.month == today.month &&
           now.day == today.day) {
-        //
+        // disable alarm
+        disableAlarm(today);
       } else {
         await prefs.setBool('isFajr', false);
         await prefs.setBool('isDhuhr', false);
@@ -238,6 +240,18 @@ class FirebaseApi {
       DateTime endOfDay =
           DateTime(now.year, now.month, now.day, 23, 59, 59); // Akhir hari
       return endOfDay;
+    }
+  }
+
+  void disableAlarm(DateTime today) async {
+    // Ambil semua alarm
+    final alarms = await Alarm.getAlarms();
+    final alarmsForDate = alarms.where((alarm) =>
+        alarm.dateTime.year == today.year &&
+        alarm.dateTime.month == today.month &&
+        alarm.dateTime.day == today.day);
+    for (var alarm in alarmsForDate) {
+      await Alarm.stop(alarm.id);
     }
   }
 }

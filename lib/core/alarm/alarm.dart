@@ -29,18 +29,3 @@ Future<void> checkAndroidScheduleExactAlarmPermission() async {
     }
   }
 }
-
-
-void stopAlarm(int alarmId) async {
-  bool isStopped = await Alarm.stop(alarmId);
-
-  if (isStopped) {
-    if (kDebugMode) {
-      print('Alarm $alarmId berhasil dimatikan.');
-    }
-  } else {
-    if (kDebugMode) {
-      print('Gagal mematikan alarm $alarmId.');
-    }
-  }
-}

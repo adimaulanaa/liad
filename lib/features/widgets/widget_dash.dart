@@ -61,18 +61,6 @@ bool isTimeBeforeNow(String timeString) {
   return now.isBefore(givenTime);
 }
 
-DateTime setDateTimeSchadule(String time) {
-  final now = DateTime.now();
-  final givenTime = DateTime(
-    now.year,
-    now.month,
-    now.day,
-    int.parse(time.split(":")[0]), // Jam
-    int.parse(time.split(":")[1]), // Menit
-  );
-  return givenTime;
-}
-
 DateTime setDateTimeSchaduleSecond(String time, date) {
   // Gabungkan menjadi satu string datetime
   String dateTimeString = "$date $time";

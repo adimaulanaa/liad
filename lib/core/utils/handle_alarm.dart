@@ -1,7 +1,4 @@
-import 'package:alarm/alarm.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sound_mode/sound_mode.dart';
-import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 import 'package:vibration/vibration.dart';
 
 Future<void> handleAlarm() async {
@@ -20,13 +17,13 @@ Future<void> handleAlarm() async {
   }
 }
 
-Future<void> handleActiveAlarmSound(AlarmSettings alarm) async {
-  Alarm.stop(1);
+// Future<void> handleActiveAlarmSound(AlarmSettings alarm) async {
+//   Alarm.stop(1);
   
-  RingerModeStatus ringerStatus = RingerModeStatus.unknown;
-  try {
-    ringerStatus = await SoundMode.ringerModeStatus;
-  } catch (err) {
-    ringerStatus = RingerModeStatus.unknown;
-  }
-}
+//   RingerModeStatus ringerStatus = RingerModeStatus.unknown;
+//   try {
+//     ringerStatus = await SoundMode.ringerModeStatus;
+//   } catch (err) {
+//     ringerStatus = RingerModeStatus.unknown;
+//   }
+// }

@@ -234,7 +234,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(1, isFajr.value, model.fajr.toString());
                 },
                 onTapAlarm: () {
-                  setDataPray(1);
+                  setDataPray(
+                    context,
+                    1,
+                    isAlarmFajr.value,
+                    model.fajr.toString(),
+                  );
+                  changeTypePray(1, model.fajr.toString());
                 },
               ),
               ListScheduleWidget(
@@ -247,7 +253,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(2, isDhuhr.value, model.dhuhr.toString());
                 },
                 onTapAlarm: () {
-                  setDataPray(2);
+                  setDataPray(
+                    context,
+                    2,
+                    isAlarmDhuhr.value,
+                    model.dhuhr.toString(),
+                  );
+                  changeTypePray(2, model.dhuhr.toString());
                 },
               ),
               ListScheduleWidget(
@@ -260,7 +272,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(3, isAsr.value, model.asr.toString());
                 },
                 onTapAlarm: () {
-                  setDataPray(3);
+                  setDataPray(
+                    context,
+                    3,
+                    isAlarmAsr.value,
+                    model.asr.toString(),
+                  );
+                  changeTypePray(3, model.asr.toString());
                 },
               ),
               ListScheduleWidget(
@@ -273,7 +291,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(4, isMaghrib.value, model.maghrib.toString());
                 },
                 onTapAlarm: () {
-                  setDataPray(4);
+                  setDataPray(
+                    context,
+                    4,
+                    isAlarmMaghrib.value,
+                    model.maghrib.toString(),
+                  );
+                  changeTypePray(4, model.maghrib.toString());
                 },
               ),
               ListScheduleWidget(
@@ -286,7 +310,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   updateFinish(5, isIsha.value, model.isha.toString());
                 },
                 onTapAlarm: () {
-                  setDataPray(4);
+                  setDataPray(
+                    context,
+                    5,
+                    isAlarmIsha.value,
+                    model.isha.toString(),
+                  );
+                  changeTypePray(5, model.isha.toString());
                 },
               ),
             ],
@@ -419,57 +449,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {});
   }
 
-  void setDataPray(int type) {
-    if (type == 1) {
-      if (isAlarmFajr.value == false) {
-        isAlarmFajr.value = true;
-        var alarmDateTime = setDateTimeSchadule(model.fajr.toString());
-        setAlarm(type, alarmDateTime, StringResources.titleFajr,
-            StringResources.bodyFajr);
-      } else {
-        isAlarmFajr.value = false;
-        stopAlarm(type);
-      }
-    } else if (type == 2) {
-      if (isAlarmDhuhr.value == false) {
-        isAlarmDhuhr.value = true;
-        var alarmDateTime = setDateTimeSchadule(model.dhuhr.toString());
-        setAlarm(type, alarmDateTime, StringResources.titleDhuhr,
-            StringResources.bodyDhuhr);
-      } else {
-        isAlarmDhuhr.value = false;
-        stopAlarm(type);
-      }
-    } else if (type == 3) {
-      if (isAlarmAsr.value == false) {
-        isAlarmAsr.value = true;
-        var alarmDateTime = setDateTimeSchadule(model.asr.toString());
-        setAlarm(type, alarmDateTime, StringResources.titleAsr,
-            StringResources.bodyAsr);
-      } else {
-        isAlarmAsr.value = false;
-        stopAlarm(type);
-      }
-    } else if (type == 4) {
-      if (isAlarmMaghrib.value == false) {
-        isAlarmMaghrib.value = true;
-        var alarmDateTime = setDateTimeSchadule(model.maghrib.toString());
-        setAlarm(type, alarmDateTime, StringResources.titleMaghrib,
-            StringResources.bodyMaghrib);
-      } else {
-        isAlarmMaghrib.value = false;
-        stopAlarm(type);
-      }
-    } else if (type == 5) {
-      if (isAlarmIsha.value == false) {
-        isAlarmIsha.value = true;
-        var alarmDateTime = setDateTimeSchadule(model.isha.toString());
-        setAlarm(type, alarmDateTime, StringResources.titleIsha,
-            StringResources.bodyIsha);
-      } else {
-        isAlarmIsha.value = false;
-        stopAlarm(type);
-      }
+  void changeTypePray(int i, String timer) {
+    var alarmDateTime = setDateTimeSchadule(timer);
+    if (alarmDateTime.isBefore(now)) {
+      return; // Hentikan proses jika waktu tidak valid
+    }
+    if (i == 1) {
+      isAlarmFajr.value = !isAlarmFajr.value;
+    } else if (i == 2) {
+      isAlarmDhuhr.value = !isAlarmDhuhr.value;
+    } else if (i == 3) {
+      isAlarmAsr.value = !isAlarmAsr.value;
+    } else if (i == 4) {
+      isAlarmMaghrib.value = !isAlarmMaghrib.value;
+    } else if (i == 5) {
+      isAlarmIsha.value = !isAlarmIsha.value;
     }
   }
 }
