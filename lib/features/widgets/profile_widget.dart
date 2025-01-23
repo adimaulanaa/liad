@@ -617,9 +617,11 @@ Future<String> selectDate(BuildContext context, DateTime? selectedDate) async {
   return selected;
 }
 
-Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) async {
+Future<void> initAlarmProfile(
+    ScheduleSholatModel model, String selectedDates) async {
   if (model.fajr != '') {
-    var alarmDateTime = setDateTimeSchaduleSecond(model.fajr.toString(), selectedDates);
+    var alarmDateTime =
+        setDateTimeSchaduleSecond(model.fajr.toString(), selectedDates);
     await setAlarm(
       1,
       alarmDateTime,
@@ -628,7 +630,8 @@ Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) a
     );
   }
   if (model.dhuhr != '') {
-    var alarmDateTime = setDateTimeSchaduleSecond(model.dhuhr.toString(), selectedDates);
+    var alarmDateTime =
+        setDateTimeSchaduleSecond(model.dhuhr.toString(), selectedDates);
     await setAlarm(
       2,
       alarmDateTime,
@@ -637,7 +640,8 @@ Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) a
     );
   }
   if (model.asr != '') {
-    var alarmDateTime = setDateTimeSchaduleSecond(model.asr.toString(), selectedDates);
+    var alarmDateTime =
+        setDateTimeSchaduleSecond(model.asr.toString(), selectedDates);
     await setAlarm(
       3,
       alarmDateTime,
@@ -646,7 +650,8 @@ Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) a
     );
   }
   if (model.maghrib != '') {
-    var alarmDateTime = setDateTimeSchaduleSecond(model.maghrib.toString(), selectedDates);
+    var alarmDateTime =
+        setDateTimeSchaduleSecond(model.maghrib.toString(), selectedDates);
     await setAlarm(
       4,
       alarmDateTime,
@@ -655,7 +660,8 @@ Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) a
     );
   }
   if (model.isha != '') {
-    var alarmDateTime = setDateTimeSchaduleSecond(model.isha.toString(), selectedDates);
+    var alarmDateTime =
+        setDateTimeSchaduleSecond(model.isha.toString(), selectedDates);
     await setAlarm(
       5,
       alarmDateTime,
@@ -665,4 +671,113 @@ Future<void> initAlarmProfile(ScheduleSholatModel model, String selectedDates) a
   }
 }
 
+Future<dynamic> changeImage(
+  BuildContext context,
+  Size size,
+  TextEditingController imageController,
+  VoidCallback onTap,
+) {
+  return showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.bgScreen,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(20.0),
+      ),
+    ),
+    builder: (BuildContext context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          height: size.height * 0.3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text(
+                "Link Drive Images Profile",
+                style: blackTextstyle.copyWith(
+                  fontSize: 20,
+                  fontWeight: bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: imageController,
+                decoration: InputDecoration(
+                  hintText: 'Link Image',
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 13.0),
+                  hintStyle: transTextstyle.copyWith(
+                    fontSize: 15,
+                    color: AppColors.bgGrey,
+                    fontWeight: semiBold,
+                  ),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: AppColors.tertiary,
+                    ),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                style: blackTextstyle.copyWith(
+                  fontSize: 15,
+                  fontWeight: semiBold,
+                ),
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+                onTap: () {
+                  onTap();
+                },
+                child: Container(
+                  // width: size.width * 0.25,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.primary,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Simpan',
+                      style: whiteTextstyle.copyWith(
+                        fontSize: 19,
+                        fontWeight: bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 

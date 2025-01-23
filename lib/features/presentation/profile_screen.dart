@@ -14,6 +14,7 @@ import 'package:liad/features/model/weather_model.dart';
 import 'package:liad/features/presentation/dashboard_screen.dart';
 import 'package:liad/features/presentation/report_prays.dart';
 import 'package:liad/features/widgets/profile_widget.dart';
+import 'package:liad/features/widgets/view_images.dart';
 import 'package:liad/features/widgets/widget_dash.dart';
 import 'package:provider/provider.dart';
 
@@ -28,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final nameController = TextEditingController();
   final loveController = TextEditingController();
   final weatherController = TextEditingController();
+  final imageController = TextEditingController();
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<bool> isAlarmFajr = ValueNotifier(false);
   final ValueNotifier<bool> isAlarmDhuhr = ValueNotifier(false);
@@ -35,7 +37,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final ValueNotifier<bool> isAlarmMaghrib = ValueNotifier(false);
   final ValueNotifier<bool> isAlarmIsha = ValueNotifier(false);
   String myName = '';
+  String myImages = '';
   String selectedDates = '';
+  bool isImages = false;
   bool isData = false;
   bool isDtWWork = false;
   bool isDtWHome = false;
@@ -174,54 +178,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             SizedBox(height: size.height * 0.05),
-            Center(
-              child: ClipOval(
-                child: Image.asset(
-                  MediaRes.alarmBackground,
-                  width: size.width * 0.25,
-                  height: size.width * 0.25,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+            viewMyImages(size, context),
             SizedBox(height: size.height * 0.05),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  myName,
-                  style: blackTextstyle.copyWith(
-                    fontSize: 20,
-                    fontWeight: bold,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                InkWell(
-                  splashFactory: NoSplash.splashFactory,
-                  highlightColor: Colors.transparent,
-                  onTap: () {
-                    changeName(
-                      context,
-                      size,
-                      nameController,
-                      () {
-                        Navigator.pop(context);
-                        isLoading.value = true;
-                        updateNames();
-                      },
-                    );
-                  },
-                  child: SvgPicture.asset(
-                    MediaRes.pencils,
-                    fit: BoxFit.contain,
-                    width: 20,
-                    // ignore: deprecated_member_use
-                    color: AppColors.bgBlack,
-                  ),
-                )
-              ],
-            ),
+            viewMyName(context, size),
             SizedBox(height: size.height * 0.05),
             InkWell(
               splashFactory: NoSplash.splashFactory,
@@ -282,6 +241,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Center viewMyImages(Size size, BuildContext context) {
+    return Center(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                isImages
+                    ? NetworkImageWidget(
+                        imageUrl: myImages,
+                        size: size,
+                      )
+                    : AssetImageWidget(
+                        imageUrl: MediaRes.alarmBackground,
+                        size: size,
+                      ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: ClipOval(
+                    child: InkWell(
+                      onTap: () {
+                        changeImage(
+                          context,
+                          size,
+                          imageController,
+                          () {
+                            Navigator.pop(context);
+                            isLoading.value = true;
+                            updateImages();
+                          },
+                        );
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        padding: const EdgeInsets.all(5.0),
+                        child: SvgPicture.asset(
+                          MediaRes.pencils,
+                          fit: BoxFit.contain,
+                          width: 20,
+                          // ignore: deprecated_member_use
+                          color: AppColors.bgBlack,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+  }
+
+  Row viewMyName(BuildContext context, Size size) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          myName,
+          style: blackTextstyle.copyWith(
+            fontSize: 20,
+            fontWeight: bold,
+          ),
+        ),
+        const SizedBox(width: 10),
+        InkWell(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+          onTap: () {
+            changeName(
+              context,
+              size,
+              nameController,
+              () {
+                Navigator.pop(context);
+                isLoading.value = true;
+                updateNames();
+              },
+            );
+          },
+          child: SvgPicture.asset(
+            MediaRes.pencils,
+            fit: BoxFit.contain,
+            width: 20,
+            // ignore: deprecated_member_use
+            color: AppColors.bgBlack,
+          ),
+        )
+      ],
     );
   }
 
@@ -382,7 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String work = await getTypeWeather(1);
     String home = await getTypeWeather(2);
     isPeriodeMens = await getPeriodeMens();
-
+    getDataImages();
     if (work.isNotEmpty) {
       isDtWWork = true;
       workWeater = await provider.loadWeater(1);
@@ -402,6 +451,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     isLoading.value = false;
     getData();
+  }
+
+  Future<void> updateImages() async {
+    setImages(imageController.text);
+    myImages = await getImages();
+    if (myImages.isNotEmpty) {
+      isImages = true;
+      imageController.clear();
+    }
+    isLoading.value = false;
+    setState(() {});
+  }
+
+  void getDataImages() async {
+    myImages = await getImages();
+    if (myImages.isNotEmpty) {
+      isImages = true;
+      imageController.clear();
+    }
   }
 
   void getProfile() async {

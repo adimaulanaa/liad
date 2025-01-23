@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:liad/core/config/config_resources.dart';
 import 'package:liad/core/media/media_text.dart';
+import 'package:liad/core/utils/convert_link_drive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String getDayName() {
@@ -103,6 +104,18 @@ Future<String> getName() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String myName = prefs.getString('myname') ?? StringResources.myName;
   return myName;
+}
+
+Future<String> getImages() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String myName = prefs.getString('images') ?? StringResources.myName;
+  String images = clearUrlImageDriveGoogle(myName);
+  return images;
+}
+
+Future<void> setImages(String img) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('images', img);
 }
 
 Future<bool> getPeriodeMens() async {
